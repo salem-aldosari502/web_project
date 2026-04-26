@@ -15,6 +15,7 @@ import EventPage from "./components/pages/HomePage/Category/EventsPage/EventList
 import AskAIChat from "./components/pages/HomePage/AI_frame";
 import ProfilePage from "./components/pages/HomePage/profilePage";
 
+
 function App() {
   const [showAI, setShowAI] = useState(false);
   const [user, setUser] = useState(() => {
