@@ -1,0 +1,165 @@
+.delete-page {
+  width: 100%;
+  min-height: 100vh;
+  padding: 40px;
+  background: #f5f5f5;
+}
+
+.delete-container {
+  max-width: 1100px;
+  width: 100%;
+  background: #fff;
+  border-radius: 6px;
+  padding: 30px 40px;
+  margin: auto;
+}
+
+.delete-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.delete-left-side {
+  width: 25%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 15px;
+  position: relative;
+}
+
+.delete-left-side::before {
+  content: '';
+  position: absolute;
+  height: 70%;
+  width: 2px;
+  right: -15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #afafb6;
+}
+
+.delete-details {
+  margin: 14px;
+  text-align: center;
+}
+
+.delete-details i {
+  font-size: 30px;
+  color: #3e2093;
+  margin-bottom: 10px;
+}
+
+.delete-topic {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.delete-text-one,
+.delete-text-two,
+.delete-right-side p {
+  font-size: 14px;
+  color: #666;
+}
+
+.delete-right-side {
+  width: 75%;
+  margin-left: 75px;
+}
+
+.delete-topic-text {
+  font-size: 23px;
+  font-weight: 600;
+  color: #3e2093;
+}
+
+.delete-input-box {
+  height: 50px;
+  width: 100%;
+  margin: 12px 0;
+}
+
+.delete-input-box input,
+.delete-input-box textarea {
+  height: 100%;
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  background: #f0f1f8;
+  border-radius: 6px;
+  padding: 0 15px;
+  resize: none;
+}
+
+.delete-message-box {
+  min-height: 110px;
+}
+
+.delete-message-box textarea {
+  padding-top: 10px;
+  min-height: 110px;
+}
+
+.delete-button {
+  display: inline-block;
+  margin-top: 12px;
+}
+
+.delete-button input[type='button'] {
+  color: #fff;
+  font-size: 18px;
+  outline: none;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 6px;
+  background: #3e2093;
+  cursor: pointer;
+}
+
+.delete-button input[type='button']:hover {
+  background: #5029bc;
+}
+
+@media (max-width: 950px) {
+  .delete-container {
+    width: 90%;
+    padding: 30px 35px 40px 35px;
+  }
+
+  .delete-right-side {
+    width: 75%;
+    margin-left: 55px;
+  }
+}
+
+@media (max-width: 820px) {
+  .delete-container {
+    margin: 40px auto;
+    height: 100%;
+  }
+
+  .delete-content {
+    flex-direction: column-reverse;
+  }
+
+  .delete-left-side {
+    width: 100%;
+    flex-direction: row;
+    margin-top: 40px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .delete-left-side::before {
+    display: none;
+  }
+
+  .delete-right-side {
+    width: 100%;
+    margin-left: 0;
+  }
+}

@@ -1,0 +1,156 @@
+.settings-card {
+  width: 520px;
+  min-height: 620px;
+  margin: 50px auto;
+  padding: 40px;
+
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 24px;
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  color: white;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+.settings-row {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+.settings-container {
+  width: 100%;
+}
+
+.settings-container h1 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 30px;
+  font-weight: 600;
+}
+
+.settings-section {
+  margin-bottom: 30px;
+  padding: 20px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+
+  backdrop-filter: blur(6px);
+}
+
+.settings-section h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 14px 16px;
+
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+.settings-label {
+  font-weight: 600;
+  color: #ff7a00;
+  font-size: 0.95rem;
+}
+
+.settings-value {
+  display: flex;
+  align-items: center;
+}
+
+.toggle-container {
+  display: flex;
+  align-items: center;
+}
+
+.settings-description {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+/* Embedded components fix (VERY IMPORTANT) */
+.embedded-content {
+  width: 100%;
+}
+
+/* Kill conflicting styles from AboutUs / ContactUs */
+.embedded-content .page-wrapper,
+.embedded-content .contact,
+.embedded-content .container {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Inputs styling */
+.embedded-content input,
+.embedded-content textarea {
+  width: 100%;
+  padding: 10px 14px;
+
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+
+  background: rgba(255, 255, 255, 0.06);
+  color: white;
+
+  margin-bottom: 12px;
+}
+
+.embedded-content input::placeholder,
+.embedded-content textarea::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Button */
+.embedded-content button {
+  width: 100%;
+  padding: 10px;
+
+  border-radius: 16px;
+  border: none;
+
+  background: #ff7a00;
+  color: white;
+
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.embedded-content button:hover {
+  background: #e96f00;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+  .settings-card {
+    width: calc(100% - 40px);
+    margin: 20px;
+    padding: 24px;
+  }
+
+  .settings-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
