@@ -19,6 +19,11 @@ import {AuthProvider} from "./context/AuthContext";
 import SettingsPage from "./components/pages/HomePage/SettingsPage";
 import ScrollToTop from "./components/pages/HomePage/ScrollToTop";
 import ReviewPage from "./components/pages/HomePage/ReviewPage";
+import Admin from "./components/pages/HomePage/admin";
+import DeleteAc from './components/pages/HomePage/deleteAC';
+import EditUser from './components/pages/HomePage/edituser';
+import SendMessage from './components/pages/HomePage/sendmessage';
+import UserData from './components/pages/HomePage/userdata';
 
 function App() {
   const [showAI, setShowAI] = useState(false);
@@ -66,6 +71,11 @@ function App() {
           <Route path="/profile" element={<ProfilePage user={user} setUser={setUser} />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/reviewpage" element={<ReviewPage />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/delete" element={<DeleteAc />} />
+          <Route path="/edituser" element={<EditUser />} />
+          <Route path="/sendmessage" element={<SendMessage />} />
+          <Route path="/userdata" element={<UserData />} />
           <Route path="/" element={<Home />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
