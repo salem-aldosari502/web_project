@@ -14,6 +14,22 @@ function Login({ setUser }){
         e.preventDefault();
         setError("");
 
+        // Frontend hardcoded admin (no database)
+        if (email === 'admin@admin.com' && password === 'admin') {
+            const fakeToken = 'admin-jwt-fake-token';
+            const fakeUser = { id: 'admin_id', name: 'Admin', email: 'admin@admin.com', role: 'admin', avatar: null };
+            
+            localStorage.setItem('token', fakeToken);
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('user', JSON.stringify(fakeUser));
+            localStorage.setItem(`profileAvatar_${fakeUser.id}`, fakeUser.avatar);
+            
+            setUser(fakeUser);
+            login(fakeToken, fakeUser.name, fakeUser.role, fakeUser.id);
+            navigate('/admin');
+            return;
+        }
+
         try {
             const response = await fetch('http://localhost:5001/api/users/login', {
                 method: 'POST',
@@ -41,7 +57,12 @@ function Login({ setUser }){
             
             login(data.token, data.user.name, data.user.role, data.user.id);
             
-            navigate('/home');
+            // Admin direct to admin page
+            if (data.user.role === 'admin') {
+                navigate('/admin');
+            } else {
+                navigate('/home');
+            }
         } catch (err) {
             if (err.message === 'Failed to fetch' || err.name === 'TypeError') {
                 setError("⚠️ Server is currently offline. Please try again later.");

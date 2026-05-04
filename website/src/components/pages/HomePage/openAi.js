@@ -3,13 +3,15 @@ import OpenAI from "openai";
 
 const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
 
-if (!apiKey) {
-  console.error("Error: OPENAI_API_KEY is not set in the environment variables.");
+let openai = null;
+if (apiKey) {
+  openai = new OpenAI({
+    apiKey: apiKey,
+    dangerouslyAllowBrowser: true,
+  });
+} else {
+  console.warn("OpenAI disabled: REACT_APP_OPENAI_API_KEY not set. Add to .env and restart.");
 }
-const openai = new OpenAI({
-  apiKey: apiKey,
-  dangerouslyAllowBrowser: true,
-});
 
 const SYSTEM_PROMPT = `
 You are a helpful AI assistant for a travel and tourism website.
@@ -55,6 +57,9 @@ Maximize helpful travel guidance while gently filtering unrelated requests witho
 `;
 
 export async function getAIResponse(userMessage) {
+  if (!openai) {
+    return "OpenAI not configured. Add REACT_APP_OPENAI_API_KEY to .env";
+  }
   try {
     const response = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
