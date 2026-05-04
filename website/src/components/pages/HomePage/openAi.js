@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 
-const apiKey = process.env.OPENAI_API_KEY;
+
+const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
 
 if (!apiKey) {
   console.error("Error: OPENAI_API_KEY is not set in the environment variables.");

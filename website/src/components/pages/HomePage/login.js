@@ -33,9 +33,11 @@ function Login({ setUser }){
 
             localStorage.setItem('token', data.token);
             localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('user', JSON.stringify(data.user));
+            const fullUser = {...data.user, avatar: data.user.avatar || null};
+            localStorage.setItem('user', JSON.stringify(fullUser));
+            localStorage.setItem(`profileAvatar_${data.user.id}`, fullUser.avatar);
             
-            setUser(data.user);
+            setUser(fullUser);
             
             login(data.token, data.user.name, data.user.role, data.user.id);
             

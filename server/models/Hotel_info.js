@@ -17,15 +17,25 @@ const hotelInfoSchema = new mongoose.Schema({
     type: String,
     default: "N/A"
   },
-  location: String,
-  lat: Number,
-  lng: Number,
-  link: String,
-  photo_url: String,
+  location: {
+    type: String
+  },
+  lat: {
+    type: Number
+  },
+  lng: {
+    type: Number
+  },
+  link: {
+    type: String
+  },
+  photo_url: {
+    type: String
+  },
   maxGuests: {
     type: Number,
     default: 4
   }
 }, { timestamps: true });
 
-module.exports = mongoose.model('Hotel_Info', hotelInfoSchema,'Hotel_Info');
+module.exports = mongoose.model('Hotel_info', hotelInfoSchema,'Hotel_info');

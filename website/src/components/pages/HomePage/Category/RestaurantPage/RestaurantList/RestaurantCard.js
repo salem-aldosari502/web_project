@@ -2,25 +2,29 @@ import restaurants_image from "../../../../../../images/restaurants_image.png"
 
 function RestaurantCard({ data, onOpenPopup }) {
   return (<>
-    <butoon type="button" className="category-btn" onClick={()=> onOpenPopup(data)}>
+    <button type="button" className="category-btn" onClick={() => onOpenPopup(data)}>
       <div className="catigory-item">
-        <img src={restaurants_image} alt="restaurant_image" width={200} height={100} />
+        <img src={data.image || restaurants_image} alt="restaurant_image" width={200} height={100} />
         <div className="item-info">
-          <p className="item-title">{data.name}</p>
-          <p className="item-description">Description</p>
+          <p className="item-title">{data.RestaurantName}</p>
+          <p className="item-description">{data.Description}</p>
+          <p>⭐ {data.Rating} | ${data.Price} | {data.FinancialRange}</p>
         </div>
 
           <div className="item-btn">
-            <button id="gap"
-              type="text" 
+            <button 
+              type="button" 
               className="pr-btn"
-              onClick={() => onOpenPopup(data)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenPopup(data);
+              }}
             >
               Details
             </button>
           </div>
       </div>
-    </butoon>
+    </button>
   </>);
 }
 

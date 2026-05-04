@@ -7,9 +7,9 @@ function HotelCard({ data, onOpenPopup }) {
           <img src={data.image || hotels_image} alt={data.name} width={200} height={100} style={{}}/>
           <div style={{color: "white"}}>
             <p>{data.name}</p>
-            <p>⭐ {data.rating}</p>
-            <p>${data.price}</p>
-            <p>{data.location}</p>
+            <p>⭐ {data.rating || 'N/A'}</p>
+            <p>{data.price || 'N/A'}</p>
+            <p>{data.location || 'N/A'}</p>
           </div>
 
           <div className="item-btn">

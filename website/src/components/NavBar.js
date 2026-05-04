@@ -11,9 +11,23 @@ function Navigation({ setShowAI, user, setUser }) {
     const [avatarSrc, setAvatarSrc] = useState(null);
 
     useEffect(() => {
+      const storedUserStr = localStorage.getItem('user');
+      let avatarFromUser = null;
+      if (storedUserStr) {
+        try {
+          const storedUser = JSON.parse(storedUserStr);
+          avatarFromUser = storedUser.avatar || null;
+        } catch (e) {
+          console.warn('Failed to parse stored user');
+        }
+      }
+      
+      // Fallback to profile avatar (set on change)
       const savedAvatar = localStorage.getItem(`profileAvatar_${user?.id}`);
-      if (savedAvatar) {
-        setAvatarSrc(savedAvatar);
+      const avatarToSet = avatarFromUser || savedAvatar || null;
+      
+      if (avatarToSet) {
+        setAvatarSrc(avatarToSet);
       }
     }, [user?.id]);
 
@@ -44,7 +58,6 @@ function Navigation({ setShowAI, user, setUser }) {
                     {user ? (
                         <Nav>
                             <NavDropdown align="end" title={<Image src={avatarUrl} roundedCircle width={34} height={34} />}>
-
                                 <NavDropdown.Item><Nav.Link as={Link} to='/profile' style={{color: "#212529"}}>Profile</Nav.Link></NavDropdown.Item>
                                 <NavDropdown.Item><Nav.Link as={Link} to='/settings' style={{color: "#212529"}}>Settings</Nav.Link></NavDropdown.Item>
                                 <NavDropdown.Divider />
@@ -64,4 +77,3 @@ function Navigation({ setShowAI, user, setUser }) {
 }
 
 export default Navigation;
-
