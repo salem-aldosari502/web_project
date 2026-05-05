@@ -1,16 +1,14 @@
-
 import HotelCard from "./HotelCard";
-import SearchBar from "../SearchBar";
+import SearchBar from "../../SearchBar";
 import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
-import FilterPanel from "../FilterPanel/FilterPanel";
+import FilterPanel from "../FilterPanel/HotelFilterPanel";
 import hotels_image from "../../../../../../images/hotels_image.png";
 import DetailsPopup from "../../DetailsPopup";
-import FilterBar from "../FilterBar";
-
+import FilterBar from "../../FilterBar";
 
 function HotelsPage() {
-const category = "Hotels";
+  const category = "Hotels";
   const [searchValue, setSearchValue] = useState("");
   const [showPopup, setShowPopup] = useState(false);
   const [selectedHotel, setSelectedHotel] = useState(null);
@@ -26,25 +24,36 @@ const category = "Hotels";
   });
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  function openPopup(hotel){
+  function openPopup(hotel) {
     setSelectedHotel(hotel);
     setShowPopup(true);
   }
-  function closePopup(){
+  function closePopup() {
     setShowPopup(false);
     setSelectedHotel(null);
   }
 
-const fetchHotels = async () => {
+  const normalizeHotel = (hotel) => ({
+  ...hotel,
+  location: typeof hotel.location === "object" && hotel.location !== null
+    ? `${hotel.location.lat}, ${hotel.location.lng}`
+    : hotel.location || null
+});
+
+  const fetchHotels = async () => {
     setLoading(true);
     try {
       const response = await axios.get("http://localhost:5001/api/hotels/google");
-      setHotels(response.data);
-    } catch (err) {
-      console.error("API error:", err);
-      const response = await axios.get("http://localhost:5001/api/hotels/google");
-      setHotels(response.data);
-      await axios.post("http://localhost:5001/api/hotels", response.data);
+      setHotels((response.data || []).map(normalizeHotel));
+    } catch (googleErr) {
+      console.error("Google API error:", googleErr);
+      try {
+        const response = await axios.get("http://localhost:5001/api/hotels");
+        setHotels((response.data || []).map(normalizeHotel));
+      } catch (dbErr) {
+        console.error("DB fallback error:", dbErr);
+        setHotels([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -66,10 +75,8 @@ const fetchHotels = async () => {
     return hotels.filter((hotel) => {
       const cleanPrice = hotel.price ? parseFloat(hotel.price.replace(/[^0-9.]/g, '')) : 0;
       const numPrice = isNaN(cleanPrice) ? 0 : cleanPrice;
-      
-      console.log('Filtering:', {hotelName: hotel.name, rawPrice: hotel.price, numPrice, filters});
-      
-      if (filters.search && !hotel.name.toLowerCase().includes(filters.search.toLowerCase()) && !hotel.location?.toLowerCase().includes(filters.search.toLowerCase())) return false;
+
+      if (filters.search && !hotel.name?.toLowerCase().includes(filters.search.toLowerCase()) && !hotel.location?.toLowerCase().includes(filters.search.toLowerCase())) return false;
       if (filters.location && !hotel.location?.toLowerCase().includes(filters.location.toLowerCase())) return false;
       if (filters.maxGuests && hotel.maxGuests < parseInt(filters.maxGuests)) return false;
       if (filters.rating && (parseFloat(hotel.rating) || 0) < filters.rating) return false;
@@ -98,7 +105,7 @@ const fetchHotels = async () => {
         />
         <FilterBar onFilterClick={() => setIsFilterOpen(!isFilterOpen)} />
         {isFilterOpen && (
-          <FilterPanel 
+          <FilterPanel
             isOpen={isFilterOpen}
             onClose={() => setIsFilterOpen(false)}
             filters={filters}
@@ -106,13 +113,15 @@ const fetchHotels = async () => {
           />
         )}
       </div>
-      <div  className="catigory-box">
+      <div className="catigory-box">
         <section className="catigory-pages-layout">
           <div className="btn-gap">
             {loading ? (
-              <div >Loading hotels...</div>
+              <div>Loading hotels...</div>
+            ) : hotels.length === 0 ? (
+              <div>No hotels available. Check server or API key.</div>
             ) : filteredHotels.length === 0 ? (
-              <div>No hotels match the selected filters.</div>
+              <div>No hotels match the selected filters. Try clearing filters.</div>
             ) : (
               filteredHotels.map((hotel) => (
                 <HotelCard
@@ -123,7 +132,6 @@ const fetchHotels = async () => {
               ))
             )}
           </div>
-
           <DetailsPopup
             show={showPopup}
             item={selectedHotel}
@@ -134,7 +142,6 @@ const fetchHotels = async () => {
       </div>
     </div>
   </>);
-
 }
 
-export default HotelsPage
+export default HotelsPage;

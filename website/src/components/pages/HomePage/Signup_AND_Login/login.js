@@ -1,44 +1,25 @@
 import { useState } from "react";
 import { Form, Button } from "react-bootstrap";
 import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../../../context/AuthContext";
+import { useAuth } from "../../../../context/AuthContext";
 
-function Login({ setUser }){
+function Login({ setUser }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
     const { login } = useAuth();
 
-    async function handleSubmit(e){
+    async function handleSubmit(e) {
         e.preventDefault();
         setError("");
-
-        // Frontend hardcoded admin (no database)
-        if (email === 'admin@admin.com' && password === 'admin') {
-            const fakeToken = 'admin-jwt-fake-token';
-            const fakeUser = { id: 'admin_id', name: 'Admin', email: 'admin@admin.com', role: 'admin', avatar: null };
-            
-            localStorage.setItem('token', fakeToken);
-            localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('user', JSON.stringify(fakeUser));
-            localStorage.setItem(`profileAvatar_${fakeUser.id}`, fakeUser.avatar);
-            
-            setUser(fakeUser);
-            login(fakeToken, fakeUser.name, fakeUser.role, fakeUser.id);
-            navigate('/admin');
-            return;
-        }
 
         try {
             const response = await fetch('http://localhost:5001/api/users/login', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
             });
-            console.log("Login response status:", response.status);
 
             const data = await response.json();
 
@@ -49,20 +30,23 @@ function Login({ setUser }){
 
             localStorage.setItem('token', data.token);
             localStorage.setItem('isLoggedIn', 'true');
-            const fullUser = {...data.user, avatar: data.user.avatar || null};
-            localStorage.setItem('user', JSON.stringify(fullUser));
-            localStorage.setItem(`profileAvatar_${data.user.id}`, fullUser.avatar);
-            
+
+            const fullUser = { ...data.user, avatar: data.user.avatar || null };
+            localStorage.setItem('auth_user', JSON.stringify(fullUser));
+
+            if (fullUser.avatar) {
+                localStorage.setItem(`profileAvatar_${data.user.id}`, fullUser.avatar);
+            }
+
             setUser(fullUser);
-            
             login(data.token, data.user.name, data.user.role, data.user.id);
-            
-            // Admin direct to admin page
+
             if (data.user.role === 'admin') {
                 navigate('/admin');
             } else {
                 navigate('/home');
             }
+
         } catch (err) {
             if (err.message === 'Failed to fetch' || err.name === 'TypeError') {
                 setError("⚠️ Server is currently offline. Please try again later.");
@@ -72,9 +56,9 @@ function Login({ setUser }){
         }
     }
 
-    return (<>
-        <div className="background-layer"></div>
-
+    return (
+        <>
+            <div className="background-layer"></div>
             <section className="login">
                 <div className="login-card">
                     <h2>Login Page</h2>
@@ -83,25 +67,30 @@ function Login({ setUser }){
                     <Form onSubmit={handleSubmit} className="login-form">
                         <Form.Group controlId="formBasicEmail">
                             <Form.Label>Email address</Form.Label>
-                            <Form.Control 
-                                type="email" 
-                                placeholder="Enter email" 
+                            <Form.Control
+                                type="text"
+                                placeholder="Enter email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
                             />
                         </Form.Group>
-
                         <Form.Group controlId="formBasicPassword">
-                            <Form.Label >Password</Form.Label>
-                            <Form.Control 
-                                type="password" 
-                                placeholder="Password" 
+                            <Form.Label>Password</Form.Label>
+                            <Form.Control
+                                type="password"
+                                placeholder="Password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
                             />
                         </Form.Group>
+                        {/* ✅ Forgot password link */}
+                        <div style={{ textAlign: 'right', marginBottom: '10px' }}>
+                            <Link to="/forgot-password" style={{ color: '#007bff', fontSize: '13px' }}>
+                                Forgot password?
+                            </Link>
+                        </div>
                         <Button variant="primary" type="submit">
                             Login
                         </Button>
@@ -111,8 +100,8 @@ function Login({ setUser }){
                     </p>
                 </div>
             </section>
-     </>);
+        </>
+    );
 }
 
 export default Login;
-

@@ -1,50 +1,141 @@
-import { eventsData } from "../../mockUpdata/EventData";
+import axios from "axios";
 import EventCard from "./EventCard";
-import SearchBar from "../SearchBar";
-import { useState } from "react";
+import SearchBar from "../../SearchBar";
+import { useState, useEffect, useMemo } from "react";
 import DetailsPopup from "../../DetailsPopup";
-import FilterBar from "../FilterBar";
-
+import FilterBar from "../../FilterBar";
+import FilterPanel from "../FilterPanel/EventFilterPanel";
 
 function EventPage() {
-    const [searchValue, setSearchValue] = useState("");
-    const catigory = "Events";
-    const [showPopup, setShowPopup] = useState(false);
-    const [selectedEvent, setSelectedEvent] = useState(null);
+  const category = "Events";
+  const [searchValue, setSearchValue] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [events, setEvents] = useState([]);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [filters, setFilters] = useState({
+  search: "",
+  location: "",
+  date: "",
+  rating: 0,
+  price: "",
+  financialRange: ""
+});
 
-    function openPopup(hotel){
-        setSelectedEvent(hotel);
-        setShowPopup(true);
+  function openPopup(event) {
+    setSelectedEvent(event);
+    setShowPopup(true);
+  }
+
+  function closePopup() {
+    setShowPopup(false);
+    setSelectedEvent(null);
+  }
+
+  const normalizeEvent = (e) => ({
+    ...e,
+    Location: typeof e.Location === "object" && e.Location !== null
+      ? `${e.Location.lat}, ${e.Location.lng}`
+      : e.Location || null
+  });
+
+  const fetchEvents = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get("http://localhost:5001/api/events");
+      setEvents((response.data || []).map(normalizeEvent));
+    } catch (apiErr) {
+      console.error("Events API error:", apiErr);
+      try {
+        const response = await axios.get("http://localhost:5001/api/events/db");
+        setEvents((response.data || []).map(normalizeEvent));
+      } catch (dbErr) {
+        console.error("DB fallback error:", dbErr);
+        setEvents([]);
+      }
+    } finally {
+      setLoading(false);
     }
+  };
 
-    function closePopup(){
-        setShowPopup(false);
-        setSelectedEvent(null);
-    }
+  useEffect(() => {
+    fetchEvents();
+    setFilters({
+      search: "",
+    location: "",
+    date: "",
+    rating: 0,
+    price: "",
+    financialRange: ""
+    });
+  }, []);
 
+  const filteredEvents = useMemo(() => {
+    return events.filter((event) => {
+      if (filters.search &&
+        !event.EventName?.toLowerCase().includes(filters.search.toLowerCase()) &&
+        !event.Description?.toLowerCase().includes(filters.search.toLowerCase())
+      ) return false;
 
-    return (<>
+      if (filters.location && !event.Location?.toLowerCase().includes(filters.location.toLowerCase())) return false;
+
+      if (filters.date && event.Date && event.Date < filters.date) return false;
+
+      if (filters.rating && (parseFloat(event.Rating) || 0) < filters.rating) return false;
+
+      if (filters.price && event.Price && parseFloat(event.Price) > parseFloat(filters.price)) return false;
+
+      if (filters.financialRange && filters.financialRange !== "" &&
+        event.FinancialRange !== "N/A" &&
+        event.FinancialRange !== filters.financialRange
+      ) return false;
+
+      return true;
+    });
+  }, [events, filters]);
+
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, search: searchValue }));
+  }, [searchValue]);
+
+  return (<>
     <div className="catigory-padding">
-      <dive className="search-form gap-2">
+      <div className="search-form gap-2">
         <SearchBar
           searchValue={searchValue}
           setSearchValue={setSearchValue}
-          catigory={catigory}
+          catigory={category}
         />
-        <FilterBar />
-      </dive>
-      <div  className="catigory-box">
+        <FilterBar onFilterClick={() => setIsFilterOpen(!isFilterOpen)} />
+        {isFilterOpen && (
+          <FilterPanel
+            isOpen={isFilterOpen}
+            onClose={() => setIsFilterOpen(false)}
+            filters={filters}
+            onFilterChange={setFilters}
+          />
+        )}
+      </div>
+      <div className="catigory-box">
         <section className="catigory-pages-layout">
           <div className="btn-gap">
-            {eventsData.map((event) => (
-              <EventCard
-                key={event.id}
-                data={event}
-                onOpenPopup={openPopup}
-              />
-            ))}
+            {loading ? (
+              <div>Loading events...</div>
+            ) : events.length === 0 ? (
+              <div>No events available. Check server or API key.</div>
+            ) : filteredEvents.length === 0 ? (
+              <div>No events match the selected filters. Try clearing filters.</div>
+            ) : (
+              filteredEvents.map((event) => (
+                <EventCard
+                  key={event.EventID || event._id}
+                  data={event}
+                  onOpenPopup={openPopup}
+                />
+              ))
+            )}
           </div>
-
           <DetailsPopup
             show={showPopup}
             item={selectedEvent}
@@ -54,8 +145,7 @@ function EventPage() {
         </section>
       </div>
     </div>
-    </>);
-
+  </>);
 }
 
-export default EventPage
+export default EventPage;

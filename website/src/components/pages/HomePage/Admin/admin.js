@@ -21,34 +21,57 @@ function Admin() {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem('token');
+
+      if (!token) {
+        setError('No token found. Please log in again.');
+        setUsers([]);
+        setLoading(false);
+        return;
+      }
+
       const response = await fetch('http://localhost:5001/api/users/all', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
+
       const data = await response.json();
-      setUsers(data);
+
+      if (!response.ok) {
+        setError(data.message || 'Access denied');
+        setUsers([]);
+        return;
+      }
+
+      setUsers(Array.isArray(data) ? data : []);
+
     } catch (err) {
       setError('Failed to fetch users');
+      setUsers([]);
     } finally {
       setLoading(false);
     }
   };
 
   const deleteUser = async (id) => {
-    // eslint-disable-next-line no-restricted-globals, no-alert
     if (confirm('Delete user?')) {
       try {
         const token = localStorage.getItem('token');
-        await fetch(`http://localhost:5001/api/users/${id}`, {
+        const response = await fetch(`http://localhost:5001/api/users/${id}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`,
           },
         });
+
+        if (!response.ok) {
+          const data = await response.json();
+          alert(data.message || 'Delete failed');
+          return;
+        }
+
         fetchUsers();
       } catch (err) {
-        // eslint-disable-next-line no-alert
         alert('Delete failed');
       }
     }
@@ -122,7 +145,7 @@ function Admin() {
                 </tr>
               </thead>
               <tbody>
-                {users.slice(-4).slice().reverse().map((user) => (
+                {users.slice(-4).reverse().map((user) => (
                   <tr key={user._id || user.id}>
                     <td>
                       <div className="ud-user-cell">
@@ -135,7 +158,7 @@ function Admin() {
                     <td>{user.email}</td>
                     <td>{user.role || 'user'}</td>
                     <td>
-                      <span className={`ud-status ud-status-active`}>
+                      <span className="ud-status ud-status-active">
                         Active
                       </span>
                       <button onClick={() => deleteUser(user._id || user.id)} className="delete-btn">

@@ -11,7 +11,7 @@ const fetchRestaurants = async () => {
       {
         params: {
           query: "restaurants in kuwait",
-          key: process.env.GOOGLE_API_KEY_RESTAURANTS,
+          key: process.env.GOOGLE_API_KEY,
           pagetoken: nextPageToken,
         },
       }
@@ -99,8 +99,17 @@ exports.getRestaurants = async (req, res) => {
 
     res.json(result);
   } catch (err) {
-    console.error("Full error:", err); // ✅ log full error
-    res.status(500).json({ error: err.message });
+    console.error("Full error:", err);
+    // Fallback to DB
+    try {
+      const restaurants = await RestaurantInfo.find().lean();
+      if (restaurants.length === 0) {
+        return res.status(404).json({error: 'No restaurants in DB and API failed'});
+      }
+      res.json(restaurants);
+    } catch (dbErr) {
+      res.status(500).json({error: 'DB error'});
+    }
   }
 };
 

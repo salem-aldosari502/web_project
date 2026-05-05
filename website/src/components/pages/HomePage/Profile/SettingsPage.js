@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { ToggleButton, ButtonGroup } from "react-bootstrap";
-import AboutUs from './About';
-import ContactUs from './Contact';
+import AboutUs from '../About';
+import ContactUs from '../Contact';
 
 function SettingsPage() {
     const [notificationsEnabled, setNotificationsEnabled] = useState(false);
