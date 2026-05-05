@@ -47,7 +47,7 @@ const handleChange = (e) => {
     if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
     if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
     if (!formData.email || !formData.email.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)) newErrors.email = 'Valid email is required';
-    if (formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters';
+    if (formData.password.length < 8) newErrors.password = 'Password must be at least 8 characters';
     if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
     if (!formData.gender) newErrors.gender = 'Please select a gender';
     
@@ -168,7 +168,7 @@ const handleSubmit = async (e) => {
             <input
                 type="password"
                 name="password"
-                placeholder="Password (min 6 chars)"
+                placeholder="Password (min 8 chars)"
                 value={formData.password}
                 onChange={handleChange}
             />

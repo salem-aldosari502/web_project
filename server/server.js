@@ -9,6 +9,7 @@ const contactRoutes = require('./routes/contactRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const hotelRoutes = require('./routes/hotelRoutes');
 const restaurantRoutes = require('./routes/restaurantRoutes');
+const eventRoutes = require('./routes/eventRoutes');
 
 const app= express();
 
@@ -20,6 +21,7 @@ app.use("/api/reviews", reviewRoutes);
 app.use("/api/contact-messages", contactRoutes);
 app.use("/api/hotels", hotelRoutes);
 app.use("/api/restaurants", restaurantRoutes);
+app.use("/api/events", eventRoutes);
 
 app.get("/", (req,res)=>{
     console.log("server hit", req.url);

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap');
+
 .App {
   text-align: center;
 }
@@ -7,14 +9,23 @@
   pointer-events: none;
 }
 
+/* ── BACKGROUND: replace image with luxury dark ── */
 .background-layer {
   position: fixed;
   inset: 0;
-  background-image: url("./images/Hero_Background.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  background: #080c14;
   z-index: -2;
+}
+
+/* Subtle gold grid overlay (same as mainPage) */
+.background-layer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(212, 175, 97, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212, 175, 97, 0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -23,57 +34,55 @@
   }
 }
 
+/* ── TITLE BAR: luxury gold ── */
 .title {
   width: 100%;
   text-align: center;
-  padding: 18px 20px;
-  background: linear-gradient(
-    to bottom,
-    rgba(15, 23, 42, 0.85),
-    rgba(15, 23, 42, 0.65)
-  );
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  padding: 14px 20px;
+  background: rgba(8, 12, 20, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(212, 175, 97, 0.15);
   position: relative;
   z-index: 5;
 }
 
 .title h1 {
   margin: 0;
-  font-size: 1.6rem;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  color: white;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #d4af61;
+  text-transform: uppercase;
 }
 
-
+/* ── APP HEADER ── */
 .App-header {
-  background-color:transparent;
-  color: white;
+  background-color: transparent;
+  color: #e8dcc8;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin); 
+  font-size: calc(10px + 2vmin);
+  font-family: 'DM Sans', sans-serif;
 }
 
+/* ── OVERLAY: softer dark veil ── */
 .overlay-layer {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.35);
+  background: rgba(8, 12, 20, 0.55);
   z-index: -1;
 }
 
 .App-link {
-  color: #61dafb;
+  color: #d4af61;
 }
 
 @keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../context/AuthContext';
-import Default_Avatar from "../../../images/Default_Avatar.png";
+import { useAuth } from '../../../../context/AuthContext';
+import Default_Avatar from "../../../../images/Default_Avatar.png";
 import './profilePage.css';
 
 function ProfilePage({ user, setUser }) {

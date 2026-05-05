@@ -4,7 +4,6 @@ import { Form } from "react-bootstrap";
 function SearchBar({searchValue, setSearchValue, catigory=(()=>{String || []}) }) {
     function handleSubmit(e){
         e.preventDefault();
-        alert("Searching");
     }
     return (
         <Form className="d-flex" style={{width: "70%"}} onSubmit={handleSubmit}>

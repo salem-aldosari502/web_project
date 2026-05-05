@@ -1,31 +1,33 @@
-import restaurants_image from "../../../../../../images/restaurants_image.png"
+import restaurants_image from "../../../../../../images/restaurants_image.png";
 
 function RestaurantCard({ data, onOpenPopup }) {
   return (<>
-    <button type="button" className="category-btn" onClick={() => onOpenPopup(data)}>
+    <button type="button" className="catigory-card" onClick={() => onOpenPopup(data)}>
       <div className="catigory-item">
-        <img src={data.image || restaurants_image} alt="restaurant_image" width={200} height={100} />
-        <div className="item-info">
-          <p className="item-title">{data.RestaurantName}</p>
-          <p className="item-description">{data.Description}</p>
-          <p>⭐ {data.Rating} | ${data.Price} | {data.FinancialRange}</p>
+        <img src={data.image || restaurants_image} alt={data.RestaurantName} width={200} height={100} />
+        <div style={{ color: "white" }}>
+          <p>{data.RestaurantName || 'N/A'}</p>
+          <p>{data.Description || ''}</p>
         </div>
-
-          <div className="item-btn">
-            <button 
-              type="button" 
-              className="pr-btn"
-              onClick={(e) => {
-                e.stopPropagation();
-                onOpenPopup(data);
-              }}
+        <div className="item-btn">
+          <button
+            type="button"
+            className="pr-btn"
+            onClick={(e) => { e.stopPropagation(); onOpenPopup(data); }}
+          >
+            Details
+          </button>
+          {data.link && (
+            <button className="pr-btn"
+              onClick={(e) => { e.stopPropagation(); window.open(data.link, "_blank"); }}
             >
-              Details
+              Visit Restaurant Site
             </button>
-          </div>
+          )}
+        </div>
       </div>
     </button>
   </>);
 }
 
-export default RestaurantCard
+export default RestaurantCard;

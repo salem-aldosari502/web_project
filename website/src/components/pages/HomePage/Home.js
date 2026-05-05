@@ -13,9 +13,8 @@ function Home() {
     <div className="page-wrapper">
       <div className="background-layer"></div>
 
-      <div >
+      <div className='horizental_line'>
             <HeroSection />
-
             <section className="cards-section">
             <div className="section-header">
                 <h2>Explore Categories</h2>

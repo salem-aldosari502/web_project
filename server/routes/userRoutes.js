@@ -8,12 +8,15 @@ const {
     getAllUsers,
     getUserById,
     updateUser,
-    deleteUser
+    deleteUser,
+    forgotPassword,
+    resetPassword
 } = require("../controllers/userController");
-
 
 route.post("/signup", signupUser);
 route.post("/login", loginUser);
+route.post("/forgot-password", forgotPassword);
+route.post("/reset-password/:token", resetPassword);
 
 route.get("/all", protect, authorizeRoles("admin"), getAllUsers);
 route.get("/:id", protect, getUserById);

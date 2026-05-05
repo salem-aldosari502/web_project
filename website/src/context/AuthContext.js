@@ -4,7 +4,7 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
     const [auth, setAuth] = useState(() => {
-        const saved = localStorage.getItem("user");
+        const saved = localStorage.getItem("auth_user");
         return saved ? JSON.parse(saved) : { username: null, role: null, id: null };
     });
 
@@ -13,7 +13,7 @@ export function AuthProvider({ children }) {
     }, []);
 
     const getStoredUser = useCallback(() => {
-        const stored = localStorage.getItem("user");
+        const stored = localStorage.getItem("auth_user");
         return stored ? JSON.parse(stored) : null;
     }, []);
 
@@ -59,4 +59,3 @@ export function useAuth() {
     }
     return context;
 }
-
