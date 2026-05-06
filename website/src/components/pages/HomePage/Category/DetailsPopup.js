@@ -1,11 +1,12 @@
 import { createPortal } from "react-dom";
-import { Nav } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import hotels_image from "../../../../images/hotels_image.png";
 import restaurants_image from "../../../../images/restaurants_image.png";
 import events_image from "../../../../images/events_image.png";
 
 function DetailsPopup({ show, item, type, onClose }) {
+  const navigate = useNavigate();
+
   if (!show || !item) return null;
 
   const name = item.name || item.HotelName || item.RestaurantName || item.EventName || "N/A";
@@ -17,6 +18,17 @@ function DetailsPopup({ show, item, type, onClose }) {
   const location = typeof rawLocation === "object" && rawLocation !== null
     ? `${rawLocation.lat}, ${rawLocation.lng}`
     : rawLocation || null;
+
+  const handleReview = () => {
+    onClose();
+    navigate("/reviewpage", {
+      state: {
+        itemType: type || "general",
+        itemId: item._id || item.id || "",
+        itemName: name,
+      },
+    });
+  };
 
   return createPortal(
     <div className="description-popup-overlay">
@@ -58,9 +70,9 @@ function DetailsPopup({ show, item, type, onClose }) {
           )}
         </ul>
 
-        <Nav.Link as={Link} to='/reviewpage' type="button" className="pr-btn">
+        <button type="button" className="pr-btn" onClick={handleReview}>
           Add a Review
-        </Nav.Link>
+        </button>
       </div>
     </div>,
     document.body

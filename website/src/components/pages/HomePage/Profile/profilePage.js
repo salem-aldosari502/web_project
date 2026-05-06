@@ -65,6 +65,10 @@ function ProfilePage({ user, setUser }) {
 
   };
 
+  const [userReviews, setUserReviews] = useState([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [deletingReview, setDeletingReview] = useState(null);
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
@@ -72,6 +76,36 @@ function ProfilePage({ user, setUser }) {
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  useEffect(() => {
+    if (!user?.id) return;
+    setReviewsLoading(true);
+    const token = localStorage.getItem('token');
+    fetch(`http://localhost:5001/api/reviews/user/${user.id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => r.ok ? r.json() : [])
+      .then((data) => setUserReviews(Array.isArray(data) ? data : []))
+      .catch(() => {})
+      .finally(() => setReviewsLoading(false));
+  }, [user?.id]);
+
+  const handleDeleteReview = async (reviewId) => {
+    if (!window.confirm('Delete this review?')) return;
+    setDeletingReview(reviewId);
+    try {
+      const token = localStorage.getItem('token');
+      await fetch(`http://localhost:5001/api/reviews/${reviewId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUserReviews((prev) => prev.filter((r) => r._id !== reviewId));
+    } catch {
+      alert('Failed to delete review.');
+    } finally {
+      setDeletingReview(null);
+    }
+  };
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -416,10 +450,71 @@ function ProfilePage({ user, setUser }) {
           </div>
         </div>
 
+        {/* My Reviews */}
+        <div style={{ marginTop: '28px' }}>
+          <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#000', marginBottom: '14px', borderBottom: '2px solid #000', paddingBottom: '8px' }}>
+            My Reviews
+          </h3>
+          {reviewsLoading ? (
+            <p style={{ color: '#888', fontSize: '14px' }}>Loading reviews...</p>
+          ) : userReviews.length === 0 ? (
+            <p style={{ color: '#888', fontSize: '14px' }}>You haven't written any reviews yet.</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {userReviews.map((r) => (
+                <div key={r._id} style={{
+                  border: '1px solid #dee2e6',
+                  borderRadius: '12px',
+                  padding: '14px 16px',
+                  background: '#f8f9fa',
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
+                        <span style={{ fontSize: '15px', fontWeight: 700, color: '#000' }}>
+                          {r.title || 'Review'}
+                        </span>
+                        {r.itemName && (
+                          <span style={{ fontSize: '12px', background: '#000', color: '#fff', borderRadius: 99, padding: '2px 8px', textTransform: 'capitalize' }}>
+                            {r.itemType} · {r.itemName}
+                          </span>
+                        )}
+                      </div>
+                      <div style={{ color: '#000', fontSize: '16px', marginBottom: 4 }}>
+                        {'★'.repeat(r.Evaluate)}{'☆'.repeat(5 - r.Evaluate)}
+                      </div>
+                      <p style={{ margin: 0, fontSize: '13px', color: '#495057' }}>{r.Comment}</p>
+                      <small style={{ color: '#aaa', fontSize: '12px' }}>
+                        {new Date(r.ReviewDate || r.createdAt).toLocaleDateString()}
+                      </small>
+                    </div>
+                    <button
+                      onClick={() => handleDeleteReview(r._id)}
+                      disabled={deletingReview === r._id}
+                      style={{
+                        padding: '6px 12px',
+                        border: '1px solid #dc3545',
+                        borderRadius: 8,
+                        background: 'transparent',
+                        color: '#dc3545',
+                        fontSize: '12px',
+                        cursor: 'pointer',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {deletingReview === r._id ? '...' : 'Delete'}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         <div className="profile-actions">
           <button onClick={handleLogout} className="profile-logout-btn">Logout</button>
-          <button 
-            onClick={handleDelete} 
+          <button
+            onClick={handleDelete}
             className="profile-delete-btn"
           >
             Delete Account

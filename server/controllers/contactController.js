@@ -1,18 +1,36 @@
 const ContactMessage = require('../models/contact_messages');
+const Message = require('../models/Message');
 
 exports.createMessage = async (req, res) => {
     try {
-        const { UserID, Name, Email, Message } = req.body;
-        
+        const { UserID, Name, Email, Message: Body } = req.body;
+
         const newMessage = await ContactMessage.create({
             UserID,
             Name,
             Email,
-            Message,
+            Message: Body,
             DateSent: new Date(),
             Status: 'Pending'
         });
-        
+
+        // also drop a copy into the unified admin inbox so the
+        // dashboard's "User Messages" panel picks it up
+        try {
+            await Message.create({
+                senderName:   Name,
+                senderEmail:  Email,
+                senderUserId: UserID || undefined,
+                subject:      '(contact form)',
+                body:         Body,
+                direction:    'in',
+                status:       'unread',
+                contactMsgId: newMessage._id   // link back so admin actions can sync status
+            });
+        } catch (mirrorErr) {
+            console.warn('Mirror to messages failed:', mirrorErr.message);
+        }
+
         res.status(201).json(newMessage);
     } catch (error) {
         res.status(400).json({ message: error.message });

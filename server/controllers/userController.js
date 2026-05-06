@@ -93,11 +93,13 @@ exports.getUserById = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
     try {
-        const { name, email, password, gender, avatar } = req.body;
+        const { name, email, password, gender, avatar, phone, role } = req.body;
         const updateData = {};
         if (name) updateData.name = name;
         if (email) updateData.email = email;
         if (gender) updateData.gender = gender;
+        if (phone) updateData.phone = phone;
+        if (role) updateData.role = role;
         if (avatar !== undefined) updateData.avatar = avatar;
         if (password) {
             updateData.password = await bcrypt.hash(password, 10);

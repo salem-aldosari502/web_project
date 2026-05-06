@@ -1,49 +1,57 @@
 const express = require('express');
 const mongoose = require('mongoose');
-
-const cors= require('cors');
+const cors = require('cors');
 require('dotenv').config();
 
-const userRoutes= require('./routes/userRoutes');
+const userRoutes = require('./routes/userRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const hotelRoutes = require('./routes/hotelRoutes');
 const restaurantRoutes = require('./routes/restaurantRoutes');
 const eventRoutes = require('./routes/eventRoutes');
+const messageRoutes = require('./routes/messageRoutes'); // ✅ new
 
-const app= express();
+const app = express();
 
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 
-app.use("/api/users", userRoutes);
-app.use("/api/reviews", reviewRoutes);
-app.use("/api/contact-messages", contactRoutes);
-app.use("/api/hotels", hotelRoutes);
-app.use("/api/restaurants", restaurantRoutes);
-app.use("/api/events", eventRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/contact-messages', contactRoutes);
+app.use('/api/hotels', hotelRoutes);
+app.use('/api/restaurants', restaurantRoutes);
+app.use('/api/events', eventRoutes);
+app.use('/api/messages', messageRoutes); // ✅ new
 
-app.get("/", (req,res)=>{
-    console.log("server hit", req.url);
-    res.send("API is running");
+app.get('/', (req, res) => {
+  console.log('server hit', req.url);
+  res.send('API is running');
 });
 
-app.get("/health", (req,res)=>{
-    res.send("ok");
+let dbConnected = false;
+
+const PORT = process.env.PORT || 5001;
+app.listen(PORT, () => {
+  console.log(`Listening to port ${PORT}`);
 });
 
-console.log("Connecting to MongoDB...");
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    ok: true,
+    db: dbConnected ? 'connected' : 'disconnected',
+  });
+});
+
+console.log('Connecting to MongoDB...');
 
 mongoose
-    .connect(process.env.MONGO_URI_LOCAL)
-    .then(()=>{
-        console.log("connected to DB");
-        const PORT = process.env.PORT || 5001;
-        app.listen(PORT, ()=>{
-            console.log(`Listening to port ${PORT}`);
-        })
-    })
-    .catch((err)=>{
-        console.error("DB connect error: ", err.message);
-    });
-
+  .connect(process.env.MONGO_URI_LOCAL)
+  .then(() => {
+    dbConnected = true;
+    console.log('connected to DB');
+  })
+  .catch((err) => {
+    dbConnected = false;
+    console.error('DB connect error: ', err.message);
+  });

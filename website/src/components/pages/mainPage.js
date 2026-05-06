@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Footer from "../../components/footer";
 import "./mainPage.css";
 
-const reviews = [
+const FALLBACK_REVIEWS = [
   { id: 1, name: "Sarah Al-Rashidi", role: "Travel Enthusiast", rating: 5, text: "This platform completely transformed how I explore Kuwait. Finding hotels and restaurants has never been this seamless!", avatar: "S" },
   { id: 2, name: "Mohammed Al-Kuwari", role: "Business Traveler", rating: 5, text: "Incredibly well-organized. I booked three events in one evening. The interface is intuitive and beautifully designed.", avatar: "M" },
   { id: 3, name: "Layla Hassan", role: "Local Explorer", rating: 4, text: "I discovered hidden gems in my own city thanks to this platform. The reviews are genuine and the search filters are spot on.", avatar: "L" },
@@ -46,7 +46,7 @@ export default function MainPage() {
   const navigate = useNavigate();
   const [showAllReviews, setShowAllReviews] = useState(false);
   const [visibleStats, setVisibleStats] = useState(false);
-  const [activeReview, setActiveReview] = useState(0);
+  const [reviews, setReviews] = useState(FALLBACK_REVIEWS);
   const sliderRef = useRef(null);
   const statsRef = useRef(null);
 
@@ -57,6 +57,25 @@ export default function MainPage() {
     );
     if (statsRef.current) observer.observe(statsRef.current);
     return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    fetch('http://localhost:5001/api/reviews')
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          const mapped = data.slice(0, 12).map((r, i) => ({
+            id: r._id || i,
+            name: r.UserID?.name || 'Anonymous',
+            role: r.itemName ? `Review of ${r.itemName}` : 'Platform Review',
+            rating: r.Evaluate || 5,
+            text: r.Comment || '',
+            avatar: (r.UserID?.name || 'A').charAt(0).toUpperCase(),
+          }));
+          setReviews(mapped);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const scrollSlider = (dir) => {

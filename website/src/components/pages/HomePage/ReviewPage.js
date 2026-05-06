@@ -1,237 +1,289 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Form, Button, Alert } from 'react-bootstrap';
-import { FaStar } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 
-function ReviewPage() {
-  const [formData, setFormData] = useState({
-    title: '',
-    reviewText: '',
-    rating: 0
-  });
+function StarRating({ value, hover, onRate, onHover, onLeave }) {
+  return (
+    <div style={{ display: 'flex', gap: 6, margin: '8px 0' }}>
+      {[1, 2, 3, 4, 5].map((star) => (
+        <span
+          key={star}
+          onClick={() => onRate(star)}
+          onMouseEnter={() => onHover(star)}
+          onMouseLeave={onLeave}
+          style={{
+            fontSize: 32,
+            cursor: 'pointer',
+            color: star <= (hover || value) ? '#000' : '#ccc',
+            transition: 'color 0.15s',
+            userSelect: 'none',
+          }}
+        >
+          ★
+        </span>
+      ))}
+    </div>
+  );
+}
 
-  const [errors, setErrors] = useState({});
-  const [success, setSuccess] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [submitError, setSubmitError] = useState('');
-  const [hoverRating, setHoverRating] = useState(0);
+function ReviewPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { auth, getToken } = useAuth();
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+  const itemState = location.state || {};
+  const itemType = itemState.itemType || 'general';
+  const itemId   = itemState.itemId   || '';
+  const itemName = itemState.itemName || '';
 
-    if (errors[e.target.name]) {
-      setErrors({ ...errors, [e.target.name]: '' });
+  const [formData, setFormData] = useState({ title: '', reviewText: '', rating: 0 });
+  const [hover, setHover] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [done, setDone] = useState(false);
+
+  // Redirect to login if not authenticated — keep return path
+  useEffect(() => {
+    if (!auth?.id) {
+      navigate('/login', { state: { returnTo: '/reviewpage', returnState: itemState } });
     }
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth?.id]);
 
-  const handleStarClick = (rating) => {
-    setFormData({ ...formData, rating });
-    setErrors({ ...errors, rating: '' });
-  };
-
-  const handleStarHover = (rating) => {
-    setHoverRating(rating);
-  };
-
-  const handleStarHoverOut = () => {
-    setHoverRating(0);
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-    if (!formData.title.trim()) newErrors.title = 'Review title is required';
-    if (!formData.reviewText.trim()) newErrors.reviewText = 'Review text is required';
-    if (formData.rating === 0) newErrors.rating = 'Please select a rating';
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  if (!auth?.id) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitError('');
-    
-    if (!validateForm()) return;
+    setError('');
+    if (!formData.title.trim()) { setError('Please add a title.'); return; }
+    if (!formData.reviewText.trim()) { setError('Please write your review.'); return; }
+    if (!formData.rating) { setError('Please select a star rating.'); return; }
 
-    if (!auth?.id) {
-      setSubmitError('Please log in to submit a review');
-      return;
-    }
-    
     setLoading(true);
     try {
       const token = getToken();
-      const response = await fetch('http://localhost:5001/api/reviews', {
+      const res = await fetch('http://localhost:5001/api/reviews', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          UserID: auth.id,
+          UserID:   auth.id,
           Evaluate: formData.rating,
-          Rating: 0, // Default for hotel/etc, can be context-specific later
-          Comment: `${formData.title}: ${formData.reviewText}`
-        })
+          Rating:   formData.rating,
+          title:    formData.title.trim(),
+          Comment:  formData.reviewText.trim(),
+          itemType,
+          itemId,
+          itemName,
+        }),
       });
 
-      if (response.ok) {
-        setSuccess(true);
-        alert('Review submitted successfully! Thank you for your feedback!');
-        setFormData({ title: '', reviewText: '', rating: 0 });
-        setHoverRating(0);
-      } else {
-        const err = await response.json();
-        setSubmitError(err.message || 'Failed to submit review');
+      if (!res.ok) {
+        const d = await res.json();
+        setError(d.message || 'Failed to submit review.');
+        return;
       }
+      setDone(true);
     } catch (err) {
-      if (err.message === 'Failed to fetch' || err.name === 'TypeError') {
-          alert('⚠️ Server is currently offline. Please try again later.');
-      } else {
-        setSubmitError('Network error. Please try again.');
-      }
+      setError('Server error. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  if (success) {
+  if (done) {
     return (
-      <>
-        <div className="background-layer"></div>
-        <div className="login-card" style={{ maxWidth: '500px', margin: '100px auto' }}>
-          <h2>Review Submitted!</h2>
-          <p>Thank you for sharing your experience!</p>
-          <div style={{ fontSize: '2.5rem', color: '#ff7a00', margin: '30px 0', display: 'flex', justifyContent: 'center' }}>
-            {[1,2,3,4,5].map((star) => (
-              <FaStar 
-                key={star} 
-                style={{ marginRight: '5px' }}
-              />
-            ))}
+      <div style={styles.page}>
+        <div style={styles.card}>
+          <div style={{ fontSize: 48, textAlign: 'center', marginBottom: 12 }}>
+            {'★'.repeat(formData.rating)}
           </div>
-          <Button 
-            variant="primary" 
-            onClick={() => {
-              setSuccess(false);
-              navigate(-1);
-            }}
-            style={{ background: '#ff7a00', border: 'none', width: '100%' }}
-            className="mb-3"
-          >
-            Back to Listing
-          </Button>
+          <h2 style={styles.heading}>Review Submitted!</h2>
+          <p style={styles.sub}>Thank you for sharing your experience{itemName ? ` with ${itemName}` : ''}.</p>
+          <button style={styles.btnPrimary} onClick={() => navigate(-1)}>
+            ← Back to Listing
+          </button>
         </div>
-      </>
+      </div>
     );
   }
 
   return (
-    <>
-      <div className="background-layer"></div>
-      <section className="signup" style={{width: "80%"}}>
-        <div className="contact-card">
-          <h2>Share Your Review</h2>
-          <p>Tell us about your experience</p>
-          
-          <Form onSubmit={handleSubmit} className="contact-form" style={{width: "90%"}}>
-            <Form.Group className="mb-3">
-              <Form.Label>Review Title</Form.Label>
-              <Form.Control 
-                type="text"
-                name="title"
-                placeholder="e.g. Amazing Information and Service!"
-                value={formData.title}
-                onChange={handleChange}
-                isInvalid={!!errors.title}
-              />
-              <Form.Control.Feedback type="invalid">
-                {errors.title}
-              </Form.Control.Feedback>
-            </Form.Group>
+    <div style={styles.page}>
+      <div style={styles.card}>
+        <h2 style={styles.heading}>Write a Review</h2>
+        {itemName && (
+          <p style={styles.sub}>
+            <span style={styles.tag}>{itemType}</span> {itemName}
+          </p>
+        )}
 
-            <Form.Group className="mb-3">
-              <Form.Label>Rating</Form.Label>
-              <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center' }}>
-                {[1,2,3,4,5].map((star) => (
-                  <FaStar
-                    key={star}
-                    size={30}
-                    color={star <= (hoverRating || formData.rating) ? '#ff7a00' : '#666'}
-                    style={{
-                      cursor: 'pointer',
-                      marginRight: '8px',
-                      transition: 'color 0.2s ease'
-                    }}
-                    onClick={() => handleStarClick(star)}
-                    onMouseEnter={() => handleStarHover(star)}
-                    onMouseLeave={handleStarHoverOut}
-                  />
-                ))}
-              </div>
-              {errors.rating && (
-                <div className="text-danger" style={{ fontSize: '0.9rem', marginTop: '5px' }}>
-                  {errors.rating}
-                </div>
-              )}
-              <small className="text-white-50">
-                {formData.rating ? `You rated ${formData.rating}/5 stars` : 'Click a star to rate'}
-              </small>
-            </Form.Group>
+        <form onSubmit={handleSubmit}>
+          <div style={styles.field}>
+            <label style={styles.label}>Title</label>
+            <input
+              type="text"
+              placeholder="e.g. Great experience!"
+              value={formData.title}
+              onChange={(e) => setFormData(p => ({ ...p, title: e.target.value }))}
+              style={styles.input}
+            />
+          </div>
 
-            <Form.Group className="mb-4">
-              <Form.Label>Your Review</Form.Label>
-              <Form.Control 
-                as="textarea"
-                rows={5}
-                name="reviewText"
-                placeholder="Share your detailed experience..."
-                value={formData.reviewText}
-                onChange={handleChange}
-                isInvalid={!!errors.reviewText}
-              />
-              <Form.Control.Feedback type="invalid">
-                {errors.reviewText}
-              </Form.Control.Feedback>
-            </Form.Group>
+          <div style={styles.field}>
+            <label style={styles.label}>Rating</label>
+            <StarRating
+              value={formData.rating}
+              hover={hover}
+              onRate={(r) => setFormData(p => ({ ...p, rating: r }))}
+              onHover={setHover}
+              onLeave={() => setHover(0)}
+            />
+            <small style={{ color: '#888', fontSize: 13 }}>
+              {formData.rating ? `${formData.rating} / 5 stars` : 'Click a star to rate'}
+            </small>
+          </div>
 
-            {submitError && (
-              <Alert variant="danger" className="mb-3">{submitError}</Alert>
-            )}
-            <Button 
-              variant="primary" 
-              type="submit"
-              style={{ background: '#ff7a00', border: 'none', width: '110%' }}
-              disabled={formData.rating === 0 || loading}
-              className="mb-3"
-            >
-              {loading ? 'Submitting...' : 'Submit Review'}
-            </Button>
-          </Form>
+          <div style={styles.field}>
+            <label style={styles.label}>Your Review</label>
+            <textarea
+              rows={5}
+              placeholder="Share your detailed experience..."
+              value={formData.reviewText}
+              onChange={(e) => setFormData(p => ({ ...p, reviewText: e.target.value }))}
+              style={{ ...styles.input, resize: 'vertical' }}
+            />
+          </div>
 
-          <div style={{ textAlign: 'center' }}>
-            <Button 
-              variant="outline-light"
+          {error && (
+            <div style={styles.error}>{error}</div>
+          )}
+
+          <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
+            <button
+              type="button"
               onClick={() => navigate(-1)}
-              style={{ 
-                color: '#ff7a00', 
-                border: '2px solid #ff7a00',
-                width: '100%',
-                borderRadius: '12px'
+              style={styles.btnSecondary}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading || !formData.rating}
+              style={{
+                ...styles.btnPrimary,
+                opacity: (loading || !formData.rating) ? 0.6 : 1,
+                cursor: (loading || !formData.rating) ? 'not-allowed' : 'pointer',
               }}
             >
-              ← Back to Listing
-            </Button>
+              {loading ? 'Submitting...' : 'Submit Review'}
+            </button>
           </div>
-        </div>
-      </section>
-    </>
+        </form>
+      </div>
+    </div>
   );
 }
 
-export default ReviewPage;  
+const styles = {
+  page: {
+    minHeight: '100vh',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '40px 16px',
+    background: '#f8f9fa',
+    fontFamily: 'Inter, Arial, sans-serif',
+  },
+  card: {
+    background: '#fff',
+    border: '1px solid #dee2e6',
+    borderRadius: 24,
+    padding: '36px 40px',
+    maxWidth: 540,
+    width: '100%',
+    boxShadow: '0 20px 60px rgba(0,0,0,0.08)',
+  },
+  heading: {
+    margin: '0 0 6px',
+    fontSize: 26,
+    fontWeight: 800,
+    color: '#000',
+  },
+  sub: {
+    margin: '0 0 24px',
+    fontSize: 14,
+    color: '#6c757d',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  tag: {
+    background: '#000',
+    color: '#fff',
+    borderRadius: 99,
+    padding: '2px 10px',
+    fontSize: 12,
+    fontWeight: 600,
+    textTransform: 'capitalize',
+  },
+  field: {
+    display: 'flex',
+    flexDirection: 'column',
+    marginBottom: 18,
+  },
+  label: {
+    fontWeight: 700,
+    fontSize: 14,
+    color: '#212529',
+    marginBottom: 6,
+  },
+  input: {
+    border: '1px solid #dee2e6',
+    borderRadius: 12,
+    padding: '12px 14px',
+    fontSize: 15,
+    color: '#000',
+    outline: 'none',
+    fontFamily: 'inherit',
+    width: '100%',
+    boxSizing: 'border-box',
+    background: '#fff',
+  },
+  error: {
+    background: '#FBE9E9',
+    color: '#9C2A2A',
+    borderRadius: 8,
+    padding: '10px 14px',
+    fontSize: 14,
+    marginTop: 12,
+  },
+  btnPrimary: {
+    flex: 1,
+    padding: '13px 20px',
+    borderRadius: 14,
+    border: 'none',
+    background: '#000',
+    color: '#fff',
+    fontWeight: 700,
+    fontSize: 15,
+    cursor: 'pointer',
+    transition: '0.2s',
+  },
+  btnSecondary: {
+    flex: 1,
+    padding: '13px 20px',
+    borderRadius: 14,
+    border: '1px solid #dee2e6',
+    background: '#fff',
+    color: '#000',
+    fontWeight: 700,
+    fontSize: 15,
+    cursor: 'pointer',
+  },
+};
+
+export default ReviewPage;

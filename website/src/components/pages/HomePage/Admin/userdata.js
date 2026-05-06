@@ -1,25 +1,48 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './userdata.css';
 
-const users = [
-  { id: 1, name: 'Ahmed Ali', email: 'ahmed@example.com', date: '2026-04-18', status: 'Active' },
-  { id: 2, name: 'Sara Khaled', email: 'sara@example.com', date: '2026-04-17', status: 'Pending' },
-  { id: 3, name: 'Mohammed Naser', email: 'mohammed@example.com', date: '2026-04-16', status: 'Active' },
-  { id: 4, name: 'Fatima Hasan', email: 'fatima@example.com', date: '2026-04-15', status: 'Blocked' },
-  { id: 5, name: 'Ali يوسف', email: 'ali@example.com', date: '2026-04-14', status: 'Active' }
-];
-
 function UserData() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [search, setSearch] = useState('');
 
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch('http://localhost:5001/api/users/all', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) {
+          const d = await res.json();
+          setError(d.message || 'Access denied');
+          return;
+        }
+        const data = await res.json();
+        setUsers(Array.isArray(data) ? data : []);
+      } catch (err) {
+        setError('Failed to load users: ' + err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUsers();
+  }, []);
+
   const filteredUsers = useMemo(() => {
-    return users.filter((user) =>
-      `${user.name} ${user.email} ${user.status}`
-        .toLowerCase()
-        .includes(search.toLowerCase())
+    const q = search.toLowerCase();
+    return users.filter((u) =>
+      `${u.name} ${u.email} ${u.role || 'user'}`.toLowerCase().includes(q)
     );
-  }, [search]);
+  }, [search, users]);
+
+  const activeCount = users.filter((u) => u.role !== 'blocked').length;
+  const adminCount = users.filter((u) => u.role === 'admin').length;
+
+  if (loading) return <div className="ud-page"><div className="ud-shell"><p>Loading users...</p></div></div>;
+  if (error) return <div className="ud-page"><div className="ud-shell"><p style={{ color: 'red' }}>Error: {error}</p></div></div>;
 
   return (
     <div className="ud-page">
@@ -28,12 +51,9 @@ function UserData() {
           <div>
             <span className="ud-badge">Admin Panel</span>
             <h1>Users Data</h1>
-            <p>Manage user records with a cleaner and more modern table layout.</p>
+            <p>View and manage all registered user accounts.</p>
           </div>
-
-          <Link to="/admin" className="ud-back-btn">
-            ← Back to Dashboard
-          </Link>
+          <Link to="/admin" className="ud-back-btn">← Back to Dashboard</Link>
         </div>
 
         <div className="ud-stats">
@@ -41,15 +61,13 @@ function UserData() {
             <span>Total Users</span>
             <strong>{users.length}</strong>
           </div>
-
           <div className="ud-stat-card">
-            <span>Active</span>
-            <strong>{users.filter((u) => u.status === 'Active').length}</strong>
+            <span>Regular Users</span>
+            <strong>{activeCount - adminCount}</strong>
           </div>
-
           <div className="ud-stat-card">
-            <span>Pending</span>
-            <strong>{users.filter((u) => u.status === 'Pending').length}</strong>
+            <span>Admins</span>
+            <strong>{adminCount}</strong>
           </div>
         </div>
 
@@ -59,11 +77,10 @@ function UserData() {
               <h2>User Directory</h2>
               <span>Search, view, and review user information</span>
             </div>
-
             <div className="ud-search-box">
               <input
                 type="text"
-                placeholder="Search name, email, or status..."
+                placeholder="Search name, email, or role..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -74,49 +91,40 @@ function UserData() {
             <table className="ud-table">
               <thead>
                 <tr>
-                  <th>ID</th>
                   <th>User</th>
                   <th>Email</th>
-                  <th>Date</th>
-                  <th>Status</th>
+                  <th>Phone</th>
+                  <th>Gender</th>
+                  <th>Joined</th>
+                  <th>Role</th>
                 </tr>
               </thead>
-
               <tbody>
                 {filteredUsers.length > 0 ? (
                   filteredUsers.map((user) => (
-                    <tr key={user.id}>
-                      <td>#{user.id}</td>
+                    <tr key={user._id}>
                       <td>
                         <div className="ud-user-cell">
                           <div className="ud-avatar">
-                            {user.name.charAt(0).toUpperCase()}
+                            {user.name ? user.name.charAt(0).toUpperCase() : '?'}
                           </div>
                           <span>{user.name}</span>
                         </div>
                       </td>
                       <td>{user.email}</td>
-                      <td>{user.date}</td>
+                      <td>{user.phone || '—'}</td>
+                      <td>{user.gender || '—'}</td>
+                      <td>{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '—'}</td>
                       <td>
-                        <span
-                          className={`ud-status ${
-                            user.status === 'Active'
-                              ? 'ud-status-active'
-                              : user.status === 'Pending'
-                              ? 'ud-status-pending'
-                              : 'ud-status-blocked'
-                          }`}
-                        >
-                          {user.status}
+                        <span className={`ud-status ${user.role === 'admin' ? 'ud-status-pending' : 'ud-status-active'}`}>
+                          {user.role || 'user'}
                         </span>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="5" className="ud-empty">
-                      No users found.
-                    </td>
+                    <td colSpan="6" className="ud-empty">No users found.</td>
                   </tr>
                 )}
               </tbody>
