@@ -2,15 +2,6 @@ const Message = require('../models/Message');
 const ContactMessage = require('../models/contact_messages');
 const User = require('../models/user_info');
 
-/* ------------------------------------------------------------------ *
- * Helper: sync the linked contact_messages doc whenever admin changes
- * the status of a message that originated from the contact form.
- *
- * messages.status  →  contact_messages.Status
- *   'read'         →  'Read'
- *   'replied'      →  'Resolved'
- *   'ignored'      →  'Read'      (seen but not acted on)
- * ------------------------------------------------------------------ */
 async function syncContactStatus(msg) {
     if (!msg || !msg.contactMsgId) return;
     const statusMap = {
@@ -30,11 +21,6 @@ async function syncContactStatus(msg) {
     }
 }
 
-/* ------------------------------------------------------------------ *
- * PUBLIC: a visitor / user submits the contact form
- * POST /api/messages
- * body: { senderName, senderEmail, subject, body }   (subject optional)
- * ------------------------------------------------------------------ */
 exports.createMessage = async (req, res) => {
     try {
         const {
@@ -42,7 +28,6 @@ exports.createMessage = async (req, res) => {
             senderEmail,
             subject,
             body,
-            // legacy field names from the old Contact.js form
             Name, Email, Message: legacyBody, UserID
         } = req.body;
 
@@ -71,11 +56,6 @@ exports.createMessage = async (req, res) => {
         res.status(400).json({ message: err.message });
     }
 };
-
-/* ------------------------------------------------------------------ *
- * ADMIN: list every message (inbox + sent)
- * GET /api/messages
- * ------------------------------------------------------------------ */
 exports.getAllMessages = async (req, res) => {
     try {
         const messages = await Message.find().sort({ createdAt: -1 });
@@ -84,10 +64,6 @@ exports.getAllMessages = async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 };
-
-/* ------------------------------------------------------------------ *
- * ADMIN: get one message
- * ------------------------------------------------------------------ */
 exports.getMessageById = async (req, res) => {
     try {
         const msg = await Message.findById(req.params.id);
@@ -98,10 +74,6 @@ exports.getMessageById = async (req, res) => {
     }
 };
 
-/* ------------------------------------------------------------------ *
- * ADMIN: mark as read
- * PUT /api/messages/:id/read
- * ------------------------------------------------------------------ */
 exports.markAsRead = async (req, res) => {
     try {
         const msg = await Message.findByIdAndUpdate(
@@ -117,11 +89,6 @@ exports.markAsRead = async (req, res) => {
     }
 };
 
-/* ------------------------------------------------------------------ *
- * ADMIN: reply to a message (also flips status to "replied")
- * PUT /api/messages/:id/reply
- * body: { adminReply }
- * ------------------------------------------------------------------ */
 exports.replyToMessage = async (req, res) => {
     try {
         const { adminReply } = req.body;
@@ -146,10 +113,6 @@ exports.replyToMessage = async (req, res) => {
     }
 };
 
-/* ------------------------------------------------------------------ *
- * ADMIN: mark as ignored
- * PUT /api/messages/:id/ignore
- * ------------------------------------------------------------------ */
 exports.ignoreMessage = async (req, res) => {
     try {
         const msg = await Message.findByIdAndUpdate(
@@ -165,10 +128,6 @@ exports.ignoreMessage = async (req, res) => {
     }
 };
 
-/* ------------------------------------------------------------------ *
- * ADMIN: edit a message (subject / body / status / adminReply)
- * PUT /api/messages/:id
- * ------------------------------------------------------------------ */
 exports.updateMessage = async (req, res) => {
     try {
         const allowed = ['subject', 'body', 'status', 'adminReply', 'recipientEmail'];
@@ -184,7 +143,6 @@ exports.updateMessage = async (req, res) => {
         );
         if (!msg) return res.status(404).json({ message: 'Message not found' });
 
-        // sync back if the status was explicitly changed via the edit form
         if (update.status) await syncContactStatus(msg);
 
         res.status(200).json(msg);
@@ -193,10 +151,6 @@ exports.updateMessage = async (req, res) => {
     }
 };
 
-/* ------------------------------------------------------------------ *
- * ADMIN: delete a message
- * DELETE /api/messages/:id
- * ------------------------------------------------------------------ */
 exports.deleteMessage = async (req, res) => {
     try {
         const msg = await Message.findByIdAndDelete(req.params.id);
@@ -207,11 +161,6 @@ exports.deleteMessage = async (req, res) => {
     }
 };
 
-/* ------------------------------------------------------------------ *
- * ADMIN: compose a brand-new message and "send" it to a user
- * POST /api/messages/admin-send
- * body: { recipientEmail, subject, body }
- * ------------------------------------------------------------------ */
 exports.adminSendMessage = async (req, res) => {
     try {
         const { recipientEmail, subject, body } = req.body;
@@ -235,7 +184,6 @@ exports.adminSendMessage = async (req, res) => {
             status:          'sent'
         });
 
-        // best-effort email (silently skipped if not configured)
         try {
             if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
                 const nodemailer = require('nodemailer');
