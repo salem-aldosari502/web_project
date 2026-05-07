@@ -42,12 +42,11 @@ function ReviewPage() {
   const [error, setError] = useState('');
   const [done, setDone] = useState(false);
 
-  // Redirect to login if not authenticated — keep return path
   useEffect(() => {
     if (!auth?.id) {
       navigate('/login', { state: { returnTo: '/reviewpage', returnState: itemState } });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [auth?.id]);
 
   if (!auth?.id) return null;
@@ -62,7 +61,7 @@ function ReviewPage() {
     setLoading(true);
     try {
       const token = getToken();
-      const res = await fetch('http://localhost:5001/api/reviews', {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/reviews`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
