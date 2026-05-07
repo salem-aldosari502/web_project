@@ -6,7 +6,7 @@ function ServerStatus({ children }) {
   useEffect(() => {
     const checkServer = async () => {
       try {
-        const response = await fetch('http://localhost:5001/health', {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/health`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
         });
@@ -36,7 +36,6 @@ function ServerStatus({ children }) {
             width: '100vw',
             height: '100vh',
             backgroundColor: '#0f172a',
-            backgroundImage: 'url("../../../images/Hero_Background.png")',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             display: 'flex',

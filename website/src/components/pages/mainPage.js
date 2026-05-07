@@ -60,7 +60,7 @@ export default function MainPage() {
   }, []);
 
   useEffect(() => {
-    fetch('http://localhost:5001/api/reviews')
+    fetch(`${process.env.REACT_APP_API_URL}/api/reviews`)
       .then((r) => r.ok ? r.json() : null)
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) {
@@ -86,7 +86,6 @@ export default function MainPage() {
 
   return (
     <div className="mp-root">
-      {/* ── NAV ── */}
       <nav className="mp-nav">
         <div className="mp-nav-logo">
           <span className="mp-logo-icon">✦</span>
@@ -98,7 +97,7 @@ export default function MainPage() {
         </div>
       </nav>
 
-      {/* ── HERO ── */}
+
       <section className="mp-hero">
         <div className="mp-hero-bg">
           <div className="mp-orb mp-orb1" />
@@ -131,7 +130,6 @@ export default function MainPage() {
         </div>
       </section>
 
-      {/* ── STATS ── */}
       <section className="mp-stats" ref={statsRef}>
         {stats.map((s, i) => (
           <div key={i} className={`mp-stat ${visibleStats ? "mp-stat-visible" : ""}`} style={{ animationDelay: `${i * 0.15}s` }}>
@@ -141,7 +139,7 @@ export default function MainPage() {
         ))}
       </section>
 
-      {/* ── FEATURES ── */}
+
       <section className="mp-features">
         <div className="mp-section-header">
           <div className="mp-section-tag">What We Offer</div>
@@ -159,14 +157,12 @@ export default function MainPage() {
         </div>
       </section>
 
-      {/* ── REVIEWS ── */}
       <section className="mp-reviews">
         <div className="mp-section-header">
           <div className="mp-section-tag">Community</div>
           <h2 className="mp-section-title">What People Are Saying</h2>
         </div>
 
-        {/* Slider */}
         <div className="mp-slider-wrapper">
           <button className="mp-slider-btn mp-slider-prev" onClick={() => scrollSlider(-1)}>‹</button>
           <div className="mp-slider" ref={sliderRef}>
@@ -187,7 +183,6 @@ export default function MainPage() {
           <button className="mp-slider-btn mp-slider-next" onClick={() => scrollSlider(1)}>›</button>
         </div>
 
-        {/* All Reviews Toggle */}
         <div className="mp-reviews-toggle-wrap">
           <button className="mp-toggle-btn" onClick={() => setShowAllReviews(!showAllReviews)}>
             {showAllReviews ? "Hide Reviews ▲" : "All Reviews ▼"}
@@ -213,7 +208,6 @@ export default function MainPage() {
         )}
       </section>
 
-      {/* ── CTA BANNER ── */}
       <section className="mp-cta-banner">
         <div className="mp-cta-glow" />
         <h2 className="mp-cta-title">Ready to Explore Kuwait?</h2>

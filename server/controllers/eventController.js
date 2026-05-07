@@ -43,7 +43,7 @@ const mapEvents = (events) => {
       Rating: null,
       Review: [],
       Location: {
-        lat: event.venue?.rating ? null : null, // SerpAPI events don't return coordinates
+        lat: event.venue?.rating ? null : null,
         lng: null,
       },
       FinancialRange: mapPriceLevel(priceStr),

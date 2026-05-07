@@ -64,7 +64,7 @@ const mapRestaurants = async (places) => {
         RestaurantID:   place.place_id,
         Price:          place.price_level !== undefined ? place.price_level * 5 : null,
         Rating:         place.rating || null,
-        Review: reviews.map((r) => ({   // ✅ no outer [ ]
+        Review: reviews.map((r) => ({  
           AuthorName: r.author_name,
           Rating:     r.rating,
         })),

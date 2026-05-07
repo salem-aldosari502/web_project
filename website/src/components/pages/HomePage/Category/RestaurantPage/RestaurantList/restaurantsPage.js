@@ -43,12 +43,12 @@ function RestaurantsPage() {
   const fetchRestaurants = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:5001/api/restaurants/db");
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/restaurants/db`);
       setRestaurants((response.data || []).map(normalizeRestaurant));
     } catch (apiErr) {
       console.error("Restaurants API error:", apiErr);
       try {
-        const response = await axios.get("http://localhost:5001/api/restaurants/db");
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/restaurants/db`);
         setRestaurants((response.data || []).map(normalizeRestaurant));
       } catch (dbErr) {
         console.error("DB fallback error:", dbErr);

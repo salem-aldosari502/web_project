@@ -15,7 +15,7 @@ function Login({ setUser }) {
         setError("");
 
         try {
-            const response = await fetch('http://localhost:5001/api/users/login', {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
@@ -55,6 +55,7 @@ function Login({ setUser }) {
             }
         }
     }
+    console.log(process.env.REACT_APP_API_URL);
 
     return (
         <>
@@ -85,7 +86,6 @@ function Login({ setUser }) {
                                 required
                             />
                         </Form.Group>
-                        {/* ✅ Forgot password link */}
                         <div style={{ textAlign: 'right', marginBottom: '10px' }}>
                             <Link to="/forgot-password" style={{ color: '#007bff', fontSize: '13px' }}>
                                 Forgot password?

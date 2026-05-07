@@ -14,8 +14,6 @@ exports.createMessage = async (req, res) => {
             Status: 'Pending'
         });
 
-        // also drop a copy into the unified admin inbox so the
-        // dashboard's "User Messages" panel picks it up
         try {
             await Message.create({
                 senderName:   Name,
@@ -25,7 +23,7 @@ exports.createMessage = async (req, res) => {
                 body:         Body,
                 direction:    'in',
                 status:       'unread',
-                contactMsgId: newMessage._id   // link back so admin actions can sync status
+                contactMsgId: newMessage._id
             });
         } catch (mirrorErr) {
             console.warn('Mirror to messages failed:', mirrorErr.message);

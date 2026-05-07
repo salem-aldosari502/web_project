@@ -43,12 +43,12 @@ function EventPage() {
   const fetchEvents = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:5001/api/events");
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/events/db`);
       setEvents((response.data || []).map(normalizeEvent));
     } catch (apiErr) {
       console.error("Events API error:", apiErr);
       try {
-        const response = await axios.get("http://localhost:5001/api/events/db");
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/events/db`);
         setEvents((response.data || []).map(normalizeEvent));
       } catch (dbErr) {
         console.error("DB fallback error:", dbErr);

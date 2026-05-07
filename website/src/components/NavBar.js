@@ -49,7 +49,7 @@ function Navigation({ setShowAI, user, setUser }) {
         setAvatarSrc(null);
         setDropdownOpen(false);
         setMenuOpen(false);
-        navigate('/home');
+        navigate('/');
     };
 
     const storedUser = (() => {
@@ -132,7 +132,6 @@ function Navigation({ setShowAI, user, setUser }) {
                     )}
                 </div>
 
-                {/* Hamburger (mobile) */}
                 <button
                     className={`lux-hamburger ${menuOpen ? 'lux-hamburger--open' : ''}`}
                     onClick={() => setMenuOpen(!menuOpen)}

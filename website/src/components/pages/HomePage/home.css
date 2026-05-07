@@ -1,9 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap');
 
-/* ══════════════════════════════════════
-   HOME.CSS — luxury dark gold theme
-   mirrors mainPage.css aesthetic
-   ══════════════════════════════════════ */
 
 body {
   font-family: 'DM Sans', sans-serif;
@@ -443,6 +439,61 @@ body {
   font-weight: 300;
 }
 
+/* ── HOME COLOR BREAK: elegant gold divider band ── */
+.home-accent-band {
+  width: 100%;
+  padding: 28px 40px;
+  margin: 0 0 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  background: linear-gradient(
+    135deg,
+    rgba(200, 134, 10, 0.18) 0%,
+    rgba(212, 175, 97, 0.10) 40%,
+    rgba(180, 110, 8, 0.18) 100%
+  );
+  border-top: 1px solid rgba(212, 175, 97, 0.22);
+  border-bottom: 1px solid rgba(212, 175, 97, 0.22);
+  overflow: hidden;
+  position: relative;
+}
+
+.home-accent-band::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 60px,
+    rgba(212, 175, 97, 0.04) 60px,
+    rgba(212, 175, 97, 0.04) 61px
+  );
+  pointer-events: none;
+}
+
+.home-accent-band-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #d4af61;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+.home-accent-band-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #d4af61;
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
 /* ── CARDS / CONTACT SECTIONS ── */
 .cards-section,
 .contact-section {
@@ -795,4 +846,295 @@ body {
 @media (max-width: 990px) {
   .profile-card { padding: 28px 20px; margin: 20px; }
   .profile-info-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+}
+
+/* ════════════════════════════════════════
+   SIGNUP PAGE — all styles, zero inline
+════════════════════════════════════════ */
+
+/* ── Signup page wrapper ── */
+.signup-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 100px;
+  padding-bottom: 60px;
+  position: relative;
+}
+
+/* ── COLOR BREAK: warm amber glow orbs behind the card ── */
+.signup-page::before,
+.signup-page::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(90px);
+}
+
+.signup-page::before {
+  width: 480px;
+  height: 480px;
+  background: radial-gradient(circle, rgba(200, 134, 10, 0.13) 0%, transparent 70%);
+  top: 5%;
+  left: -8%;
+}
+
+.signup-page::after {
+  width: 380px;
+  height: 380px;
+  background: radial-gradient(circle, rgba(212, 175, 97, 0.10) 0%, transparent 70%);
+  bottom: 10%;
+  right: -6%;
+}
+
+/* ── Signup card: wider & with top spacing ── */
+.signup-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+  background: rgba(10, 15, 26, 0.80);
+  border: 1px solid rgba(212, 175, 97, 0.18);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 24px;
+  padding: 50px 56px;
+  color: #e8dcc8;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(212,175,97,0.06);
+}
+
+/* ── Color-break accent bar at top of signup card ── */
+.signup-card-accent {
+  width: calc(100% + 112px);
+  margin: -50px -56px 36px -56px;
+  padding: 14px 56px;
+  background: linear-gradient(
+    90deg,
+    rgba(200, 134, 10, 0.22) 0%,
+    rgba(212, 175, 97, 0.14) 50%,
+    rgba(180, 110, 8, 0.22) 100%
+  );
+  border-bottom: 1px solid rgba(212, 175, 97, 0.2);
+  border-radius: 24px 24px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.signup-card-accent span {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #d4af61;
+  opacity: 0.9;
+}
+
+.signup-card-accent-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(212, 175, 97, 0.55);
+}
+
+.signup-card h2 {
+  text-align: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.4rem;
+  margin-bottom: 8px;
+  color: #f0e6d0;
+}
+
+.signup-card > p,
+.signup-container > p {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 0.92rem;
+  color: rgba(232, 220, 200, 0.55);
+}
+
+/* ── Signup form inherits login-form styles, override width ── */
+.signup-card .login-form input,
+.signup-card .login-form textarea {
+  width: 100%;
+}
+
+/* ── Two-column layout for first/last name ── */
+.signup-name-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+/* ── Signup success ── */
+.signup-success {
+  text-align: center;
+  padding: 60px 40px;
+  color: #e8dcc8;
+}
+
+.signup-success h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  color: #d4af61;
+  margin-bottom: 12px;
+}
+
+.signup-success p {
+  color: rgba(232, 220, 200, 0.65);
+  margin-bottom: 24px;
+}
+
+.signup-success button {
+  padding: 12px 28px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #d4af61, #c8860a);
+  color: #080c14;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.signup-success button:hover {
+  background: linear-gradient(135deg, #e8c97a, #d4af61);
+  transform: translateY(-2px);
+}
+
+/* ── Signup container heading & subtitle ── */
+.signup-container h2 {
+  text-align: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.4rem;
+  margin-bottom: 8px;
+  color: #f0e6d0;
+}
+
+.signup-container > p {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 0.92rem;
+  color: rgba(232, 220, 200, 0.55);
+}
+
+/* ── Error messages ── */
+.signup-error {
+  color: #e07b54;
+  font-size: 13px;
+  display: block;
+  margin-top: 4px;
+}
+
+/* ── Field group (label + input stacked) ── */
+.signup-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+
+.signup-label {
+  color: rgba(232, 220, 200, 0.75);
+  font-size: 0.9rem;
+  display: block;
+}
+
+/* ── Gender radio row ── */
+.signup-gender-row {
+  display: flex;
+  gap: 70px;
+}
+
+.signup-gender-row .form-check-label {
+  display: flex;
+  align-items: center;
+  gap: 0px;
+  color: #e8dcc8;
+  cursor: pointer;
+}
+
+/* ── Date input ── */
+.signup-date-input {
+  width: 100%;
+  padding: 13px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(212, 175, 97, 0.2);
+  background: rgba(212, 175, 97, 0.05);
+  color: #e8dcc8;
+  font-size: 0.95rem;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.signup-date-input:focus {
+  border-color: rgba(212, 175, 97, 0.5);
+}
+
+/* ── Phone row ── */
+.signup-phone-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.signup-phone-prefix {
+  font-weight: 600;
+  color: #d4af61;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  padding: 13px 14px;
+  background: rgba(212, 175, 97, 0.08);
+  border: 1px solid rgba(212, 175, 97, 0.2);
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.signup-phone-row input {
+  flex: 1;
+}
+
+/* ── Bottom login link ── */
+.signup-login-link {
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 0;
+  font-size: 0.92rem;
+  color: rgba(232, 220, 200, 0.55);
+}
+
+.signup-login-link a {
+  color: #d4af61;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.signup-login-link a:hover {
+  color: #e8c97a;
+}
+
+/* ── Responsive signup ── */
+@media (max-width: 768px) {
+  .signup-card {
+    padding: 40px 28px;
+    max-width: calc(100% - 32px);
+  }
+  .signup-card-accent {
+    width: calc(100% + 56px);
+    margin: -40px -28px 30px -28px;
+    padding: 14px 28px;
+  }
+  .signup-name-row {
+    grid-template-columns: 1fr;
+  }
 }

@@ -43,12 +43,12 @@ function HotelsPage() {
   const fetchHotels = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:5001/api/hotels/google");
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/hotels/google`);
       setHotels((response.data || []).map(normalizeHotel));
     } catch (googleErr) {
       console.error("Google API error:", googleErr);
       try {
-        const response = await axios.get("http://localhost:5001/api/hotels");
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/hotels`);
         setHotels((response.data || []).map(normalizeHotel));
       } catch (dbErr) {
         console.error("DB fallback error:", dbErr);

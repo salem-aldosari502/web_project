@@ -41,7 +41,7 @@ function ProfilePage({ user, setUser }) {
         if (avatarPreview) {
           try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:5001/api/users/${user.id}`, {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${user.id}`, {
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json',
@@ -69,6 +69,10 @@ function ProfilePage({ user, setUser }) {
   const [reviewsLoading, setReviewsLoading] = useState(false);
   const [deletingReview, setDeletingReview] = useState(null);
 
+  const [userReviews, setUserReviews] = useState([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [deletingReview, setDeletingReview] = useState(null);
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
@@ -76,6 +80,36 @@ function ProfilePage({ user, setUser }) {
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  useEffect(() => {
+    if (!user?.id) return;
+    setReviewsLoading(true);
+    const token = localStorage.getItem('token');
+    fetch(`${process.env.REACT_APP_API_URL}/api/reviews/user/${user.id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => r.ok ? r.json() : [])
+      .then((data) => setUserReviews(Array.isArray(data) ? data : []))
+      .catch(() => {})
+      .finally(() => setReviewsLoading(false));
+  }, [user?.id]);
+
+  const handleDeleteReview = async (reviewId) => {
+    if (!window.confirm('Delete this review?')) return;
+    setDeletingReview(reviewId);
+    try {
+      const token = localStorage.getItem('token');
+      await fetch(`${process.env.REACT_APP_API_URL}/api/reviews/${reviewId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUserReviews((prev) => prev.filter((r) => r._id !== reviewId));
+    } catch {
+      alert('Failed to delete review.');
+    } finally {
+      setDeletingReview(null);
+    }
+  };
 
   useEffect(() => {
     if (!user?.id) return;
@@ -115,7 +149,7 @@ function ProfilePage({ user, setUser }) {
       }
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:5001/api/users/${user.id}`, {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${user.id}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -149,7 +183,7 @@ function ProfilePage({ user, setUser }) {
     }
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5001/api/users/${user.id}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${user.id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -184,7 +218,7 @@ function ProfilePage({ user, setUser }) {
     setSaving(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5001/api/users/${user.id}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${user.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -213,7 +247,7 @@ function ProfilePage({ user, setUser }) {
     if (!userData) return;
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5001/api/users/${user.id}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${user.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -356,7 +390,7 @@ function ProfilePage({ user, setUser }) {
               <button 
                 onClick={() => setShowChangePassword(true)}
                 className='confirm-btn'
-                style={{alignItems: "center"}}
+                style={{alignItems: "center",paddingBottom: '6px'}}
               >
                 Change Password
               </button>
@@ -450,9 +484,8 @@ function ProfilePage({ user, setUser }) {
           </div>
         </div>
 
-        {/* My Reviews */}
         <div style={{ marginTop: '28px' }}>
-          <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#000', marginBottom: '14px', borderBottom: '2px solid #000', paddingBottom: '8px' }}>
+          <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#dee2e6', marginBottom: '14px', borderBottom: '2px solid #000', paddingBottom: '8px' }}>
             My Reviews
           </h3>
           {reviewsLoading ? (
@@ -526,4 +559,3 @@ function ProfilePage({ user, setUser }) {
 }
 
 export default ProfilePage;
-

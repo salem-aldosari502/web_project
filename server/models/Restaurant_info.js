@@ -3,14 +3,14 @@ const mongoose = require('mongoose');
 const ReviewSchema = new mongoose.Schema({
   AuthorName: { type: String },
   Rating:     { type: Number }
-}, { _id: false }); // _id: false avoids generating unnecessary IDs per review
+}, { _id: false });
 
 const restaurantInfoSchema = new mongoose.Schema({
   RestaurantName: { type: String, required: true },
   RestaurantID:   { type: String, required: true, unique: true },
   Price:          { type: Number },
   Rating:         { type: Number },
-  Review:         [ReviewSchema],   // ✅ Properly typed sub-schema
+  Review:         [ReviewSchema],  
   Location: {
     lng: { type: Number },
     lat: { type: Number }

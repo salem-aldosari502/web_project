@@ -137,25 +137,19 @@ exports.forgotPassword = async (req, res) => {
 
         const user = await User.findOne({ email });
         if (!user) {
-            // Return success even if not found — prevents email enumeration
             return res.json({ message: "If that email exists, a reset link has been sent." });
         }
 
-        // Generate a secure random token
         const resetToken = crypto.randomBytes(32).toString('hex');
 
-        // Hash it before storing in DB
         const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
 
-        // Save to user — expires in 15 minutes
+
         user.resetPasswordToken = hashedToken;
         user.resetPasswordExpires = Date.now() + 15 * 60 * 1000;
         await user.save();
 
-        // Build the reset link — points to your frontend
-        const resetLink = `http://localhost:3000/reset-password/${resetToken}`;
-
-        // Send email
+        const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
         const transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',
@@ -200,16 +194,13 @@ exports.forgotPassword = async (req, res) => {
     }
 };
 
-// ✅ Step 2: User submits new password with the token from the link
 exports.resetPassword = async (req, res) => {
     try {
         const { token } = req.params;
         const { password } = req.body;
 
-        // Hash the incoming token to compare with DB
         const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
-
-        // Find user with matching token that hasn't expired
+        
         const user = await User.findOne({
             resetPasswordToken: hashedToken,
             resetPasswordExpires: { $gt: Date.now() }
