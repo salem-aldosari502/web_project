@@ -108,36 +108,6 @@ function ProfilePage({ user, setUser }) {
   };
 
   useEffect(() => {
-    if (!user?.id) return;
-    setReviewsLoading(true);
-    const token = localStorage.getItem('token');
-    fetch(`http://localhost:5001/api/reviews/user/${user.id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((r) => r.ok ? r.json() : [])
-      .then((data) => setUserReviews(Array.isArray(data) ? data : []))
-      .catch(() => {})
-      .finally(() => setReviewsLoading(false));
-  }, [user?.id]);
-
-  const handleDeleteReview = async (reviewId) => {
-    if (!window.confirm('Delete this review?')) return;
-    setDeletingReview(reviewId);
-    try {
-      const token = localStorage.getItem('token');
-      await fetch(`http://localhost:5001/api/reviews/${reviewId}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setUserReviews((prev) => prev.filter((r) => r._id !== reviewId));
-    } catch {
-      alert('Failed to delete review.');
-    } finally {
-      setDeletingReview(null);
-    }
-  };
-
-  useEffect(() => {
     const fetchUserData = async () => {
       if (!user || !user.id) {
         setLoading(false);
