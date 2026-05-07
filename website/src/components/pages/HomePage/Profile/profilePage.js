@@ -69,10 +69,6 @@ function ProfilePage({ user, setUser }) {
   const [reviewsLoading, setReviewsLoading] = useState(false);
   const [deletingReview, setDeletingReview] = useState(null);
 
-  const [userReviews, setUserReviews] = useState([]);
-  const [reviewsLoading, setReviewsLoading] = useState(false);
-  const [deletingReview, setDeletingReview] = useState(null);
-
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
