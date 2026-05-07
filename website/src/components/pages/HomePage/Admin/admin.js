@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import './admin.css';
-NODE_TLS_REJECT_UNAUTHORIZED
+import './admin.css'
+
 function Admin() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
