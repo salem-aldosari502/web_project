@@ -356,7 +356,7 @@ function ProfilePage({ user, setUser }) {
               <button 
                 onClick={() => setShowChangePassword(true)}
                 className='confirm-btn'
-                style={{alignItems: "center",paddingBottom: '6px'}}
+                style={{alignItems: "center",paddingBottom: '10px'}}
               >
                 Change Password
               </button>
