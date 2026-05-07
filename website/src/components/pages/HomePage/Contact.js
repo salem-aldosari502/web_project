@@ -43,7 +43,7 @@ function ContactUs(){
         body.UserID = auth.id;
       }
 
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/contact-messages`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/contact-messages`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
