@@ -1,19 +1,18 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import './admin.css';
-
+NODE_TLS_REJECT_UNAUTHORIZED
 function Admin() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // ── Messages panel state ──────────────────────────────────────────────────
   const [messages, setMessages] = useState([]);
   const [messagesLoading, setMessagesLoading] = useState(true);
   const [selectedMsg, setSelectedMsg] = useState(null);
   const [replyText, setReplyText] = useState('');
   const [replyLoading, setReplyLoading] = useState(false);
-  const [msgFilter, setMsgFilter] = useState('all'); // all | unread | replied | ignored
+  const [msgFilter, setMsgFilter] = useState('all');
 
   const quickActions = [
     { title: 'Edit User', description: 'Modify user accounts', link: '/edituser', icon: '✎' },
@@ -22,7 +21,6 @@ function Admin() {
     { title: 'User Data', description: 'View all users', link: '/userdata', icon: '☰' },
   ];
 
-  // ── Fetch users ───────────────────────────────────────────────────────────
   const fetchUsers = async () => {
     const controller = new AbortController();
     const { signal } = controller;
@@ -37,7 +35,7 @@ function Admin() {
         return;
       }
 
-      const response = await fetch('http://localhost:5001/api/users/all', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/all`, {
         signal,
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -62,11 +60,10 @@ function Admin() {
     }
   };
 
-  // ── Fetch messages ────────────────────────────────────────────────────────
   const fetchMessages = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5001/api/messages', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/messages`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!response.ok) return;
@@ -82,16 +79,14 @@ function Admin() {
   useEffect(() => {
     fetchUsers();
     fetchMessages();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ── Reply to message ──────────────────────────────────────────────────────
   const handleReply = async (id) => {
     if (!replyText.trim()) return;
     setReplyLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5001/api/messages/${id}/reply`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/messages/${id}/reply`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -114,12 +109,11 @@ function Admin() {
     }
   };
 
-  // ── Ignore message ────────────────────────────────────────────────────────
   const handleIgnore = async (id) => {
     if (!window.confirm('Mark this message as ignored?')) return;
     try {
       const token = localStorage.getItem('token');
-      await fetch(`http://localhost:5001/api/messages/${id}/ignore`, {
+      await fetch(`${process.env.REACT_APP_API_URL}/api/messages/${id}/ignore`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -130,12 +124,11 @@ function Admin() {
     }
   };
 
-  // ── Delete message ────────────────────────────────────────────────────────
   const handleDeleteMsg = async (id) => {
     if (!window.confirm('Delete this message permanently?')) return;
     try {
       const token = localStorage.getItem('token');
-      await fetch(`http://localhost:5001/api/messages/${id}`, {
+      await fetch(`${process.env.REACT_APP_API_URL}/api/messages/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -146,14 +139,13 @@ function Admin() {
     }
   };
 
-  // ── Mark as read when opened ──────────────────────────────────────────────
   const openMessage = async (msg) => {
     setSelectedMsg(msg);
     setReplyText('');
     if (msg.status === 'unread') {
       try {
         const token = localStorage.getItem('token');
-        await fetch(`http://localhost:5001/api/messages/${msg._id}/read`, {
+        await fetch(`${process.env.REACT_APP_API_URL}/api/messages/${msg._id}/read`, {
           method: 'PUT',
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -164,12 +156,11 @@ function Admin() {
     }
   };
 
-  // ── Delete user ───────────────────────────────────────────────────────────
   const deleteUser = async (id) => {
     if (window.confirm('Delete user?')) {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:5001/api/users/${id}`, {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${id}`, {
           method: 'DELETE',
           headers: { Authorization: `Bearer ${token}` },
         });

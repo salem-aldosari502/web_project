@@ -88,7 +88,6 @@ exports.getRestaurants = async (req, res) => {
 
     const restaurants = await mapRestaurants(places);
 
-    // ✅ Deduplicate by RestaurantID before inserting
     const uniqueMap = new Map();
     restaurants.forEach(r => uniqueMap.set(r.RestaurantID, r));
     const uniqueRestaurants = [...uniqueMap.values()];
@@ -100,7 +99,8 @@ exports.getRestaurants = async (req, res) => {
     res.json(result);
   } catch (err) {
     console.error("Full error:", err);
-    // Fallback to DB
+
+    
     try {
       const restaurants = await RestaurantInfo.find().lean();
       if (restaurants.length === 0) {

@@ -21,7 +21,6 @@ function adminMiddleware(req, res, next) {
   next();
 }
 
-// POST /api/messages
 router.post('/', async (req, res) => {
   try {
     const { senderName, senderEmail, subject, body } = req.body;
@@ -35,7 +34,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// GET /api/messages
+
 router.get('/', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const messages = await Message.find().sort({ createdAt: -1 });
@@ -45,7 +44,6 @@ router.get('/', authMiddleware, adminMiddleware, async (req, res) => {
   }
 });
 
-// PUT /api/messages/:id/reply
 router.put('/:id/reply', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { adminReply } = req.body;
@@ -64,7 +62,6 @@ router.put('/:id/reply', authMiddleware, adminMiddleware, async (req, res) => {
   }
 });
 
-// PUT /api/messages/:id/ignore
 router.put('/:id/ignore', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const message = await Message.findByIdAndUpdate(
@@ -79,7 +76,6 @@ router.put('/:id/ignore', authMiddleware, adminMiddleware, async (req, res) => {
   }
 });
 
-// PUT /api/messages/:id/read
 router.put('/:id/read', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const message = await Message.findByIdAndUpdate(
@@ -94,7 +90,7 @@ router.put('/:id/read', authMiddleware, adminMiddleware, async (req, res) => {
   }
 });
 
-// DELETE /api/messages/:id
+
 router.delete('/:id', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const message = await Message.findByIdAndDelete(req.params.id);

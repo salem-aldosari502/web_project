@@ -1,11 +1,4 @@
-/**
- * End-to-end smoke test for the admin "messages" feature.
- *
- * Run with: node smoke_test.js
- *
- * Spins up an in-memory MongoDB, boots the Express app, seeds an admin
- * user, then hits every admin-message endpoint and prints the results.
- */
+
 const path = require('path');
 process.chdir(path.dirname(__filename));
 process.env.JWT_SECRET = 'smoke-test-secret';
@@ -37,10 +30,8 @@ const bcrypt = require('bcrypt');
         role: 'user'
     });
 
-    // boot the app *after* env is set so server.js picks it up
     require('./server');
 
-    // give Express a tick
     await new Promise(r => setTimeout(r, 1500));
 
     const base = `http://localhost:${process.env.PORT}`;
@@ -58,7 +49,6 @@ const bcrypt = require('bcrypt');
         if (r.status >= 400) process.exitCode = 1;
     };
 
-    // 1) login as admin
     let r = await f('POST', '/api/users/login', {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: 'admin', password: 'admin' })
@@ -67,7 +57,6 @@ const bcrypt = require('bcrypt');
     const token = r.body.token;
     const auth = { Authorization: `Bearer ${token}` };
 
-    // 2) public user submits a contact message via /api/messages
     r = await f('POST', '/api/messages', {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -78,14 +67,12 @@ const bcrypt = require('bcrypt');
     log('user posts message', r);
     const msgId = r.body._id;
 
-    // 3) public user submits a contact-form message (legacy endpoint should mirror)
     r = await f('POST', '/api/contact-messages', {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ Name: 'Bob', Email: 'bob@x.com', Message: 'Old form' })
     });
     log('user posts via legacy contact-messages', r);
 
-    // 4) admin lists all messages — should see BOTH (mirror works)
     r = await f('GET', '/api/messages', { headers: auth });
     log('admin GET /messages', r);
     if (!Array.isArray(r.body) || r.body.length < 2) {
@@ -93,11 +80,10 @@ const bcrypt = require('bcrypt');
         process.exitCode = 1;
     }
 
-    // 5) admin marks message as read
     r = await f('PUT', `/api/messages/${msgId}/read`, { headers: auth });
     log('admin marks read', r);
 
-    // 6) admin replies
+
     r = await f('PUT', `/api/messages/${msgId}/reply`, {
         headers: { 'Content-Type': 'application/json', ...auth },
         body: JSON.stringify({ adminReply: 'Hi Alice, looking into it.' })
@@ -105,7 +91,7 @@ const bcrypt = require('bcrypt');
     log('admin replies', r);
     if (r.body.status !== 'replied') { console.log('   !! status not flipped to replied'); process.exitCode = 1; }
 
-    // 7) admin EDITS a message (subject + body)
+
     r = await f('PUT', `/api/messages/${msgId}`, {
         headers: { 'Content-Type': 'application/json', ...auth },
         body: JSON.stringify({ subject: 'Hello (edited)', body: 'Updated body text' })
@@ -113,7 +99,6 @@ const bcrypt = require('bcrypt');
     log('admin edits message', r);
     if (r.body.subject !== 'Hello (edited)') { console.log('   !! edit not applied'); process.exitCode = 1; }
 
-    // 8) admin SENDS a brand-new message to a user
     r = await f('POST', '/api/messages/admin-send', {
         headers: { 'Content-Type': 'application/json', ...auth },
         body: JSON.stringify({
@@ -129,15 +114,13 @@ const bcrypt = require('bcrypt');
         process.exitCode = 1;
     }
 
-    // 9) admin ignores a message
+
     r = await f('PUT', `/api/messages/${msgId}/ignore`, { headers: auth });
     log('admin ignores message', r);
 
-    // 10) admin deletes the sent message
     r = await f('DELETE', `/api/messages/${sentId}`, { headers: auth });
     log('admin deletes message', r);
 
-    // 11) NON-admin cannot access admin endpoints
     let r2 = await f('POST', '/api/users/login', {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: 'user@test.com', password: 'pass' })
@@ -151,7 +134,7 @@ const bcrypt = require('bcrypt');
         process.exitCode = 1;
     }
 
-    // wrap up
+
     await mongoose.disconnect();
     await mem.stop();
     console.log('\n--- smoke test done ---', process.exitCode ? 'WITH FAILURES' : 'all green');
