@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import './sendmessage.css';
 
-const API = 'http://localhost:5001/api';
+const API = `${process.env.REACT_APP_API_URL}/api`;
 
 function SendMessage() {
   const [formData, setFormData] = useState({
@@ -14,19 +14,16 @@ function SendMessage() {
   const [sending, setSending] = useState(false);
   const [feedback, setFeedback] = useState({ type: '', text: '' });
 
-  // sent + inbox messages from the server
   const [allMessages, setAllMessages] = useState([]);
   const [loadingList, setLoadingList] = useState(true);
 
-  // edit modal state
-  const [editing, setEditing] = useState(null); // a message object or null
+  const [editing, setEditing] = useState(null);
   const [editForm, setEditForm] = useState({ subject: '', body: '' });
   const [savingEdit, setSavingEdit] = useState(false);
 
   const token = () => localStorage.getItem('token');
   const authHeader = () => ({ Authorization: `Bearer ${token()}` });
 
-  /* ---------- load ---------- */
   const fetchMessages = useCallback(async () => {
     try {
       const res = await fetch(`${API}/messages`, { headers: authHeader() });
@@ -42,7 +39,6 @@ function SendMessage() {
 
   useEffect(() => { fetchMessages(); }, [fetchMessages]);
 
-  /* ---------- compose ---------- */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -81,7 +77,6 @@ function SendMessage() {
     }
   };
 
-  /* ---------- edit / delete ---------- */
   const startEdit = (msg) => {
     setEditing(msg);
     setEditForm({ subject: msg.subject || '', body: msg.body || '' });
@@ -127,7 +122,6 @@ function SendMessage() {
     }
   };
 
-  /* ---------- view filters ---------- */
   const sentMessages = allMessages.filter((m) => m.direction === 'out');
   const inboxMessages = allMessages.filter((m) => m.direction === 'in');
 
@@ -143,7 +137,6 @@ function SendMessage() {
           <Link to="/admin" className="ud-back-btn">← Back to Dashboard</Link>
         </div>
 
-        {/* compose */}
         <div className="ud-card">
           <div className="ud-card-top">
             <div>
@@ -219,7 +212,6 @@ function SendMessage() {
           </form>
         </div>
 
-        {/* sent log */}
         <div className="ud-card" style={{ marginTop: '2rem' }}>
           <div className="ud-card-top">
             <div>
@@ -268,7 +260,6 @@ function SendMessage() {
           )}
         </div>
 
-        {/* inbox */}
         <div className="ud-card" style={{ marginTop: '2rem' }}>
           <div className="ud-card-top">
             <div>
@@ -319,7 +310,6 @@ function SendMessage() {
           )}
         </div>
 
-        {/* edit modal */}
         {editing && (
           <div
             onClick={() => setEditing(null)}

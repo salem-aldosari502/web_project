@@ -65,7 +65,6 @@ function Navigation({ setShowAI, user, setUser }) {
         <nav className={`lux-nav ${scrolled ? 'lux-nav--scrolled' : ''}`}>
             <div className="lux-nav__inner">
 
-                {/* Left: AI button */}
                 <div className="lux-nav__left">
                     <button className="lux-ai-btn" onClick={() => setShowAI(true)}>
                         <span className="lux-ai-btn__icon">✦</span>
@@ -73,14 +72,12 @@ function Navigation({ setShowAI, user, setUser }) {
                     </button>
                 </div>
 
-                {/* Center: brand */}
                 <div className="lux-nav__brand">
-                    <Link to="/home" className="lux-brand-link">
+                    <Link to="/" className="lux-brand-link">
                         Trip<span className="lux-brand-accent">Kuwait</span>
                     </Link>
                 </div>
 
-                {/* Right: links + avatar/auth */}
                 <div className={`lux-nav__right ${menuOpen ? 'lux-nav__right--open' : ''}`}>
                     <Link to="/home"     className="lux-nav__link" onClick={() => setMenuOpen(false)}>Home</Link>
                     <Link to="/aboutus"  className="lux-nav__link" onClick={() => setMenuOpen(false)}>About</Link>
@@ -137,7 +134,6 @@ function Navigation({ setShowAI, user, setUser }) {
                     onClick={() => setMenuOpen(!menuOpen)}
                     aria-label="Toggle menu"
                 >
-                    <span /><span /><span />
                 </button>
             </div>
         </nav>

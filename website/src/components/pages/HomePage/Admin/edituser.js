@@ -100,7 +100,6 @@ function EditUser() {
       setSelectedUser(data);
       setFormData((prev) => ({ ...prev, password: '', confirmPassword: '' }));
 
-      // refresh user list
       const listRes = await fetch(`${API}/users/all`, { headers: authHeader() });
       const list = await listRes.json();
       setUsers(Array.isArray(list) ? list : []);
@@ -123,7 +122,6 @@ function EditUser() {
           <Link to="/admin" className="ud-back-btn">← Back to Dashboard</Link>
         </div>
 
-        {/* Search */}
         <div className="ud-card" style={{ marginBottom: '1.5rem' }}>
           <div className="ud-card-top">
             <div>
@@ -163,7 +161,6 @@ function EditUser() {
           )}
         </div>
 
-        {/* Edit form */}
         {selectedUser && (
           <div className="ud-card">
             <div className="ud-card-top">

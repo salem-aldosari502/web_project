@@ -3,7 +3,6 @@ const router = express.Router();
 const Message = require('../models/messageModel');
 const jwt = require('jsonwebtoken');
 
-// ── Auth middleware (same pattern as your other routes) ──────────────────────
 function authMiddleware(req, res, next) {
   const header = req.headers.authorization;
   if (!header) return res.status(401).json({ message: 'No token' });
@@ -22,8 +21,7 @@ function adminMiddleware(req, res, next) {
   next();
 }
 
-// ── Public: users submit a message (e.g. from Contact page) ─────────────────
-// POST /api/messages
+
 router.post('/', async (req, res) => {
   try {
     const { senderName, senderEmail, subject, body } = req.body;
@@ -37,8 +35,6 @@ router.post('/', async (req, res) => {
   }
 });
 
-// ── Admin: get all messages ──────────────────────────────────────────────────
-// GET /api/messages
 router.get('/', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const messages = await Message.find().sort({ createdAt: -1 });
@@ -48,8 +44,6 @@ router.get('/', authMiddleware, adminMiddleware, async (req, res) => {
   }
 });
 
-// ── Admin: reply to a message ────────────────────────────────────────────────
-// PUT /api/messages/:id/reply
 router.put('/:id/reply', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { adminReply } = req.body;
@@ -68,8 +62,6 @@ router.put('/:id/reply', authMiddleware, adminMiddleware, async (req, res) => {
   }
 });
 
-// ── Admin: ignore a message ──────────────────────────────────────────────────
-// PUT /api/messages/:id/ignore
 router.put('/:id/ignore', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const message = await Message.findByIdAndUpdate(
@@ -84,8 +76,6 @@ router.put('/:id/ignore', authMiddleware, adminMiddleware, async (req, res) => {
   }
 });
 
-// ── Admin: mark as read ──────────────────────────────────────────────────────
-// PUT /api/messages/:id/read
 router.put('/:id/read', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const message = await Message.findByIdAndUpdate(
@@ -100,8 +90,6 @@ router.put('/:id/read', authMiddleware, adminMiddleware, async (req, res) => {
   }
 });
 
-// ── Admin: delete a message ──────────────────────────────────────────────────
-// DELETE /api/messages/:id
 router.delete('/:id', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const message = await Message.findByIdAndDelete(req.params.id);

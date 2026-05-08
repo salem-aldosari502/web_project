@@ -83,7 +83,6 @@ function DeleteAc() {
           <Link to="/admin" className="ud-back-btn">← Back to Dashboard</Link>
         </div>
 
-        {/* Search card */}
         <div className="ud-card">
           <div className="ud-card-top">
             <div>
@@ -139,7 +138,6 @@ function DeleteAc() {
             </div>
           </form>
 
-          {/* User preview */}
           {foundUser && (
             <div style={{
               marginTop: 20, padding: '16px 20px', borderRadius: 16,

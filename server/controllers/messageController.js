@@ -185,19 +185,19 @@ exports.adminSendMessage = async (req, res) => {
         });
 
         try {
-            if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+            if (process.env.BREVO_USER && process.env.BREVO_PASS) {
                 const nodemailer = require('nodemailer');
                 const transporter = nodemailer.createTransport({
-                    host: 'smtp.gmail.com',
-                    port: 465,
-                    secure: true,
+                    host: 'smtp-relay.brevo.com',
+                    port: 587,
+                    secure: false,
                     auth: {
-                        user: process.env.EMAIL_USER,
-                        pass: process.env.EMAIL_PASS
+                        user: process.env.BREVO_USER,
+                        pass: process.env.BREVO_PASS
                     }
                 });
                 await transporter.sendMail({
-                    from: `"Trip Kuwait Admin" <${process.env.EMAIL_USER}>`,
+                    from: `"Trip Kuwait Admin" <${process.env.BREVO_USER}>`,
                     to:   recipientEmail,
                     subject: subject || '(no subject)',
                     text: body
