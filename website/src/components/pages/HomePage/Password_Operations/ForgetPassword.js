@@ -14,7 +14,7 @@ function ForgetPassword() {
         setLoading(true);
 
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 50000);
+        const timeout = setTimeout(() => controller.abort(), 10000);
 
         try {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/forgot-password`, {

@@ -151,18 +151,29 @@ exports.forgotPassword = async (req, res) => {
       
         const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
-        const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 465,
-            secure: true,
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
-            },
-            tls: {
-                rejectUnauthorized: false
-            }
-        });
+        const transporter = nodemailer.createTransport(
+            process.env.NODE_ENV === "production"
+                ? {
+                    host: "smtp-relay.brevo.com",
+                    port: 587,
+                    secure: false,
+                    auth: {
+                    user: process.env.BREVO_USER,
+                    pass: process.env.BREVO_PASS,
+                    },
+                    tls: { rejectUnauthorized: false }
+                }
+                : {
+                    host: "smtp.gmail.com",
+                    port: 465,
+                    secure: true,
+                    auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASS,
+                    },
+                    tls: { rejectUnauthorized: false }
+                }
+        );
 
         await transporter.sendMail({
             from: `"Trip Kuwait" <${process.env.EMAIL_USER}>`,
