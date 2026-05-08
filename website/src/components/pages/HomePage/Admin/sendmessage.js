@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import './sendmessage.css';
 
-const API = `${process.env.REACT_APP_API_URL}/api`;
+const API = `${process.env.REACT_APP_API_URL}`;
 
 function SendMessage() {
   const [formData, setFormData] = useState({

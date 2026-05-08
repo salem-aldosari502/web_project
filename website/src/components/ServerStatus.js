@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 
+const API = `${process.env.REACT_APP_API_URL}`
 function ServerStatus({ children }) {
   const [serverStatus, setServerStatus] = useState('checking');
 
   useEffect(() => {
     const checkServer = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/health`, {
+        const response = await fetch(`${API}/health`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
         });

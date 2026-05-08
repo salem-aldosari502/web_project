@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import './deleteac.css';
 
-const API = 'http://localhost:5001/api';
+const API = `${process.env.REACT_APP_API_URL}/api`;
 const token = () => localStorage.getItem('token');
 const authHeader = () => ({ Authorization: `Bearer ${token()}` });
 
