@@ -132,7 +132,6 @@ exports.deleteUser = async (req, res) => {
 
 exports.forgotPassword = async (req, res) => {
     try {
-        process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
         const { email } = req.body;
 
         const user = await User.findOne({ email });
@@ -152,17 +151,17 @@ exports.forgotPassword = async (req, res) => {
         const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
         const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 465,
-            secure: true,
+            host: 'smtp-relay.brevo.com',
+            port: 587,
+            secure: false,
             auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
+                user: process.env.BREVO_USER,
+                pass: process.env.BREVO_PASS,
             }
         });
 
         await transporter.sendMail({
-            from: `"Trip Kuwait" <${process.env.EMAIL_USER}>`,
+            from: `"Trip Kuwait" <${process.env.BREVO_USER}>`,
             to: user.email,
             subject: 'Password Reset Request',
             html: `

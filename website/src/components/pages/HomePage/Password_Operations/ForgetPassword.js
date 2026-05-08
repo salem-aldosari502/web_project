@@ -13,13 +13,18 @@ function ForgetPassword() {
         setMessage('');
         setLoading(true);
 
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 10000);
+
         try {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/forgot-password`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email })
+                body: JSON.stringify({ email }),
+                signal: controller.signal
             });
 
+            clearTimeout(timeout);
             const data = await response.json();
 
             if (!response.ok) {
@@ -28,7 +33,12 @@ function ForgetPassword() {
                 setMessage(data.message);
             }
         } catch (err) {
-            setError('⚠️ Server is currently offline. Please try again later.');
+            clearTimeout(timeout);
+            if (err.name === 'AbortError') {
+                setError('⚠️ Request timed out. Please try again.');
+            } else {
+                setError('⚠️ Server is currently offline. Please try again later.');
+            }
         } finally {
             setLoading(false);
         }
