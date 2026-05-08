@@ -43,7 +43,7 @@ function RestaurantsPage() {
   const fetchRestaurants = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/restaurants/db`);
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/restaurants/`);
       setRestaurants((response.data || []).map(normalizeRestaurant));
     } catch (apiErr) {
       console.error("Restaurants API error:", apiErr);

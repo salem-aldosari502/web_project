@@ -188,12 +188,15 @@ exports.adminSendMessage = async (req, res) => {
             if (process.env.EAMIL_USER && process.env.EMAIL_PASS) {
                 const nodemailer = require('nodemailer');
                 const transporter = nodemailer.createTransport({
-                    host: 'smtp-relay.brevo.com',
-                    port: 587,
-                    secure: false,
+                    host: 'smtp.gmail.com',
+                    port: 465,
+                    secure: true,
                     auth: {
-                        user: process.env.EAMIL_USER,
-                        pass: process.env.EMAIL_PASS
+                        user: process.env.EMAIL_USER,
+                        pass: process.env.EMAIL_PASS,
+                    },
+                    tls: {
+                        rejectUnauthorized: false
                     }
                 });
                 await transporter.sendMail({
