@@ -35,7 +35,7 @@ function ForgetPassword() {
         } catch (err) {
             clearTimeout(timeout);
             if (err.name === 'AbortError') {
-                setError("⚠️ Dont't worry you have tride and tried and tried. Be greatful my man and enjoy life <3 :) .");
+                setError('⚠️ Request timed out. Please try again.');
             } else {
                 setError('⚠️ Server is currently offline. Please try again later.');
             }
