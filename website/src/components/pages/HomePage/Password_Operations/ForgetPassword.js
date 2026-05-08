@@ -14,7 +14,7 @@ function ForgetPassword() {
         setLoading(true);
 
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 10000);
+        const timeout = setTimeout(() => controller.abort(), 50000);
 
         try {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/forgot-password`, {
@@ -35,7 +35,7 @@ function ForgetPassword() {
         } catch (err) {
             clearTimeout(timeout);
             if (err.name === 'AbortError') {
-                setError('⚠️ Request timed out. Please try again.');
+                setError("⚠️ Dont't worry you have tride and tried and tried. Be greatful my man and enjoy life <3 :) .");
             } else {
                 setError('⚠️ Server is currently offline. Please try again later.');
             }
