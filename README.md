@@ -73,8 +73,8 @@ MONGO_URI_LOCAL=mongodb+srv://<db_username>:<db_password>@cluster0.ugl4moa.mongo
 
 GOOGLE_API_KEY='Your_Google_API_Key'
 API_KEY_HOTELS='YOUR_SERPAPI_API_KEY'
-BREVO_USER=your_brevo_login_email
-BREVO_PASS=your_brevo_smtp_key
+EMAIL_USER=your_gmail_address@gmail.com
+EMAIL_PASS=your_gmail_app_password
 FRONTEND_URL=https://trip-kuwait.surge.sh
 ```
 
@@ -83,11 +83,11 @@ FRONTEND_URL=https://trip-kuwait.surge.sh
 | `MONGO_URI_LOCAL` | MongoDB Atlas connection string — use exactly as shown above |
 | `GOOGLE_API_KEY` | Google Places API key (used for restaurants and reviews) |
 | `API_KEY_HOTELS` | SerpAPI key (used for hotels and events) |
-| `BREVO_USER` | Your Brevo account login email — used to send password reset emails |
-| `BREVO_PASS` | Your Brevo SMTP key — found in Brevo dashboard under Transactional → SMTP & API |
+| `EMAIL_USER` | Gmail address used to send password reset emails |
+| `EMAIL_PASS` | Gmail **App Password** — not your regular Gmail password |
 | `FRONTEND_URL` | Deployed frontend URL — used to generate the password reset link sent via email |
 
-> ⚠️ To get your Brevo credentials: sign up at https://brevo.com → go to **Transactional → SMTP & API → SMTP tab** → copy your login email and SMTP key.
+> ⚠️ `EMAIL_PASS` must be a **Gmail App Password**. Go to: Google Account → Security → 2-Step Verification → App Passwords → generate one for "Mail".
 
 > ⚠️ `FRONTEND_URL` must point to the live frontend (`https://trip-kuwait.surge.sh`) so that password reset emails contain the correct link. When testing locally, you may change this to `http://localhost:3000`.
 
@@ -227,7 +227,7 @@ The site will redirect you directly to the Admin Dashboard at `/admin`. The **Da
 
 ## 11. Password Reset (Forgot Password)
 
-The forgot password flow sends a reset link via **Brevo** (transactional email service). For this to work, `BREVO_USER`, `BREVO_PASS`, and `FRONTEND_URL` must be set in the backend `.env`. The flow:
+The forgot password flow sends a reset link via Gmail. For this to work, `EMAIL_USER`, `EMAIL_PASS`, and `FRONTEND_URL` must be set in the backend `.env`. The flow:
 
 1. User clicks **"Forgot password?"** on the login page.
 2. They enter their email and click **Send Reset Link**.
@@ -273,8 +273,8 @@ The forgot password flow sends a reset link via **Brevo** (transactional email s
 - The seed script hasn't been run yet. Run `node scripts/seedAdmin.js` from inside `server/` and check the terminal output.
 
 **Password reset email not received**
-- Check `BREVO_USER` and `BREVO_PASS` in the backend `.env`
-- `BREVO_PASS` must be the SMTP key from your Brevo dashboard, not your Brevo account password
+- Check `EMAIL_USER` and `EMAIL_PASS` in the backend `.env`
+- `EMAIL_PASS` must be a Gmail App Password, not your regular password
 - Check that `FRONTEND_URL` is set correctly in the backend `.env`
 - Check the spam folder
 

@@ -148,25 +148,21 @@ exports.forgotPassword = async (req, res) => {
         user.resetPasswordExpires = Date.now() + 15 * 60 * 1000;
         await user.save();
 
-        /* Check here
-        |
-        |
-        |
-        */
+      
         const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
         const transporter = nodemailer.createTransport({
-            host: 'smtp-relay.brevo.com',
+            host: 'smtp.gmail.com',
             port: 587,
             secure: false,
             auth: {
-                user: process.env.BREVO_USER,
-                pass: process.env.BREVO_PASS,
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
             }
         });
 
         await transporter.sendMail({
-            from: `"Trip Kuwait" <${process.env.BREVO_USER}>`,
+            from: `"Trip Kuwait" <${process.env.EMAIL_USER}>`,
             to: user.email,
             subject: 'Password Reset Request',
             html: `
